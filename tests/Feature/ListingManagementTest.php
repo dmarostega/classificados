@@ -216,7 +216,7 @@ it('removes listing image links and media assets when updating a listing', funct
 });
 
 it('ignores listing images without media assets when serializing', function (): void {
-    $listing = new Listing();
+    $listing = new Listing;
     $listing->setRelation('images', collect([
         new ListingImage(['id' => 1, 'is_cover' => true]),
     ]));
