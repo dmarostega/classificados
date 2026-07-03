@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SeoHead from '@/components/SeoHead.vue';
+import { formatPhone, phoneHref } from '@/composables/useInputMasks';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { ListingDetail, SeoData } from '@/types';
 import { useForm } from '@inertiajs/vue3';
@@ -10,6 +11,10 @@ const props = defineProps<{ seo: SeoData; listing: ListingDetail }>();
 const selectedImage = ref(props.listing.images[0]?.url || props.listing.cover_url);
 const form = useForm({ name: '', email: '', phone: '', message: '' });
 const hasImages = computed(() => props.listing.images.length > 0);
+
+const onPhoneInput = (event: Event): void => {
+  form.phone = formatPhone((event.target as HTMLInputElement).value);
+};
 </script>
 
 <template>
@@ -63,10 +68,10 @@ const hasImages = computed(() => props.listing.images.length > 0);
         <a
           v-if="listing.contact_phone"
           class="mt-4 inline-flex items-center gap-2 text-sm font-medium"
-          :href="`tel:${listing.contact_phone}`"
+          :href="phoneHref(listing.contact_phone)"
         >
           <Phone class="h-4 w-4" />
-          {{ listing.contact_phone }}
+          {{ formatPhone(listing.contact_phone) }}
         </a>
 
         <form class="mt-6 space-y-4" @submit.prevent="form.post(`/anuncios/${listing.id}/contato`)">
@@ -98,7 +103,10 @@ const hasImages = computed(() => props.listing.images.length > 0);
               id="phone"
               v-model="form.phone"
               class="w-full rounded-md border px-3 py-2"
+              maxlength="15"
+              placeholder="(47) 99999-9999"
               type="tel"
+              @input="onPhoneInput"
             />
           </div>
           <div>

@@ -8,6 +8,8 @@ const props = defineProps<{
   seo: SeoData;
   listing: ListingDetail;
   categories: SelectOption[];
+  cities: SelectOption[];
+  states: SelectOption[];
   statuses: SelectOption[];
 }>();
 </script>
@@ -33,6 +35,8 @@ const props = defineProps<{
       <ListingForm
         :listing="listing"
         :categories="categories"
+        :cities="cities"
+        :states="states"
         :statuses="statuses"
         :submit-url="`/admin/anuncios/${props.listing.id}`"
         method="put"

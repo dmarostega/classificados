@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import PaginationLinks from '@/components/PaginationLinks.vue';
+import SearchSelect from '@/components/SearchSelect.vue';
 import SeoHead from '@/components/SeoHead.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { ListingCard, Paginated, SelectOption, SeoData } from '@/types';
@@ -52,12 +53,13 @@ const destroyListing = (id: number): void => {
           placeholder="Buscar por titulo ou descricao"
           type="search"
         />
-        <select v-model="filterForm.status" class="rounded-md border px-3 py-2">
-          <option value="">Todos os status</option>
-          <option v-for="status in statuses" :key="status.value" :value="status.value">
-            {{ status.label }}
-          </option>
-        </select>
+        <SearchSelect
+          v-model="filterForm.status"
+          clearable
+          :options="statuses"
+          placeholder="Todos os status"
+          search-placeholder="Buscar status"
+        />
         <button class="inline-flex items-center justify-center gap-2 rounded-md border px-4 py-2">
           <Search class="h-4 w-4" />
           Filtrar

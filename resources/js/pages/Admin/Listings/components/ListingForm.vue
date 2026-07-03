@@ -1,12 +1,16 @@
 <script setup lang="ts">
+import SearchSelect from '@/components/SearchSelect.vue';
+import { formatPhone } from '@/composables/useInputMasks';
 import type { ListingDetail, SelectOption } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { ImagePlus, Trash2 } from '@lucide/vue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
   listing?: ListingDetail;
   categories: SelectOption[];
+  cities: SelectOption[];
+  states: SelectOption[];
   statuses: SelectOption[];
   submitUrl: string;
   method: 'post' | 'put';
@@ -26,7 +30,7 @@ const form = useForm({
   state: props.listing?.state || '',
   contact_name: props.listing?.contact_name || '',
   contact_email: props.listing?.contact_email || '',
-  contact_phone: props.listing?.contact_phone || '',
+  contact_phone: formatPhone(props.listing?.contact_phone),
   status: props.listing?.status || 'draft',
   expires_at: props.listing?.expires_at || '',
   images: [] as File[],
@@ -34,8 +38,42 @@ const form = useForm({
 });
 
 const selectedFileNames = computed(() => files.value.map((file) => file.name).join(', '));
+const imageErrors = computed(() =>
+  Object.entries(form.errors)
+    .filter(([key]) => key === 'images' || key.startsWith('images.'))
+    .map(([, message]) => message),
+);
+const categoryOptions = computed(() =>
+  props.categories.map((category) => ({
+    value: category.id || '',
+    label: category.name || '',
+  })),
+);
+const cityOptions = computed(() =>
+  form.state ? props.cities.filter((city) => city.state_code === form.state) : [],
+);
+
+watch(
+  () => props.listing?.images,
+  (images) => {
+    existingImages.value = images || [];
+  },
+);
+
+watch(
+  () => form.state,
+  () => {
+    if (form.city && !cityOptions.value.some((city) => city.value === form.city)) {
+      form.city = '';
+    }
+  },
+);
 
 const pickImages = (): void => imageInput.value?.click();
+
+const onPhoneInput = (event: Event): void => {
+  form.contact_phone = formatPhone((event.target as HTMLInputElement).value);
+};
 
 const onImagesSelected = (event: Event): void => {
   const input = event.target as HTMLInputElement;
@@ -57,7 +95,17 @@ const submit = (): void => {
     .post(props.submitUrl, {
       forceFormData: true,
       preserveScroll: true,
-      onSuccess: () => emit('saved'),
+      onSuccess: () => {
+        files.value = [];
+        form.images = [];
+        form.remove_image_ids = [];
+
+        if (imageInput.value) {
+          imageInput.value.value = '';
+        }
+
+        emit('saved');
+      },
     });
 };
 </script>
@@ -94,16 +142,13 @@ const submit = (): void => {
         <div class="grid gap-4 md:grid-cols-3">
           <div>
             <label class="mb-1 block text-sm font-medium" for="category">Categoria</label>
-            <select
+            <SearchSelect
               id="category"
               v-model="form.category_id"
-              class="w-full rounded-md border px-3 py-2"
-              required
-            >
-              <option v-for="category in categories" :key="category.id" :value="category.id">
-                {{ category.name }}
-              </option>
-            </select>
+              :options="categoryOptions"
+              placeholder="Selecione"
+              search-placeholder="Buscar categoria"
+            />
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium" for="price">Preco</label>
@@ -118,37 +163,36 @@ const submit = (): void => {
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium" for="status">Status</label>
-            <select
+            <SearchSelect
               id="status"
               v-model="form.status"
-              class="w-full rounded-md border px-3 py-2"
-              required
-            >
-              <option v-for="status in statuses" :key="status.value" :value="status.value">
-                {{ status.label }}
-              </option>
-            </select>
+              :options="statuses"
+              placeholder="Selecione"
+              search-placeholder="Buscar status"
+            />
           </div>
         </div>
 
-        <div class="grid gap-4 md:grid-cols-[1fr_90px]">
+        <div class="grid gap-4 md:grid-cols-[90px_1fr]">
           <div>
-            <label class="mb-1 block text-sm font-medium" for="city">Cidade</label>
-            <input
-              id="city"
-              v-model="form.city"
-              class="w-full rounded-md border px-3 py-2"
-              required
+            <label class="mb-1 block text-sm font-medium" for="state">UF</label>
+            <SearchSelect
+              id="state"
+              v-model="form.state"
+              :options="states"
+              placeholder="UF"
+              search-placeholder="Buscar UF"
             />
           </div>
           <div>
-            <label class="mb-1 block text-sm font-medium" for="state">UF</label>
-            <input
-              id="state"
-              v-model="form.state"
-              class="w-full rounded-md border px-3 py-2 uppercase"
-              maxlength="2"
-              required
+            <label class="mb-1 block text-sm font-medium" for="city">Cidade</label>
+            <SearchSelect
+              id="city"
+              v-model="form.city"
+              :disabled="!form.state"
+              :options="cityOptions"
+              :placeholder="form.state ? 'Selecione' : 'Selecione UF'"
+              search-placeholder="Buscar cidade"
             />
           </div>
         </div>
@@ -184,7 +228,10 @@ const submit = (): void => {
             id="contact_phone"
             v-model="form.contact_phone"
             class="w-full rounded-md border px-3 py-2"
+            maxlength="15"
+            placeholder="(47) 99999-9999"
             type="tel"
+            @input="onPhoneInput"
           />
         </div>
         <div>
@@ -226,7 +273,11 @@ const submit = (): void => {
       <p v-if="selectedFileNames" class="mt-3 text-sm text-slate-500">
         Selecionadas: {{ selectedFileNames }}
       </p>
-      <p v-if="form.errors.images" class="mt-2 text-sm text-red-700">{{ form.errors.images }}</p>
+      <div v-if="imageErrors.length" class="mt-2 space-y-1">
+        <p v-for="error in imageErrors" :key="error" class="text-sm text-red-700">
+          {{ error }}
+        </p>
+      </div>
 
       <div v-if="existingImages.length" class="mt-5 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
         <div
