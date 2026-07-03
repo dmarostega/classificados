@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Outros', 'slug' => 'outros', 'sort_order' => 900],
         ])->each(fn (array $category): Category => Category::query()->updateOrCreate(
             ['slug' => $category['slug']],
-            $category + ['is_active' => true]
+            $category + ['is_active' => true],
         ));
 
         if (app()->isLocal() && ! User::query()->where('email', 'dev@rockcode.com.br')->exists()) {
