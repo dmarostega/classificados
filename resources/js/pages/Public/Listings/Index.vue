@@ -1,29 +1,52 @@
 <script setup lang="ts">
 import PaginationLinks from '@/components/PaginationLinks.vue';
+import SearchSelect from '@/components/SearchSelect.vue';
 import SeoHead from '@/components/SeoHead.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { ListingCard, Paginated, SelectOption, SeoData } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
 import { Search } from '@lucide/vue';
-import { reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 const props = defineProps<{
   seo: SeoData;
   categories: SelectOption[];
+  cities: SelectOption[];
   filters: { category?: string; city?: string; state?: string; q?: string };
   listings: Paginated<ListingCard>;
+  states: SelectOption[];
 }>();
 
 const filterForm = reactive({
   q: props.filters.q || '',
   category: props.filters.category || '',
-  city: props.filters.city || '',
   state: props.filters.state || '',
+  city: props.filters.state ? props.filters.city || '' : '',
 });
 
 const search = (): void => {
   router.get('/anuncios', filterForm, { preserveState: true, replace: true });
 };
+
+const categoryOptions = computed(() =>
+  props.categories.map((category) => ({
+    value: category.slug || '',
+    label: category.name || '',
+  })),
+);
+
+const cityOptions = computed(() =>
+  filterForm.state ? props.cities.filter((city) => city.state_code === filterForm.state) : [],
+);
+
+watch(
+  () => filterForm.state,
+  () => {
+    if (filterForm.city && !cityOptions.value.some((city) => city.value === filterForm.city)) {
+      filterForm.city = '';
+    }
+  },
+);
 </script>
 
 <template>
@@ -47,34 +70,37 @@ const search = (): void => {
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium" for="category">Categoria</label>
-            <select
+            <SearchSelect
               id="category"
               v-model="filterForm.category"
-              class="w-full rounded-md border px-3 py-2"
-            >
-              <option value="">Todas</option>
-              <option v-for="category in categories" :key="category.slug" :value="category.slug">
-                {{ category.name }}
-              </option>
-            </select>
+              clearable
+              :options="categoryOptions"
+              placeholder="Todas"
+              search-placeholder="Buscar categoria"
+            />
           </div>
-          <div class="grid grid-cols-[1fr_80px] gap-3">
+          <div class="grid grid-cols-[80px_1fr] gap-3">
             <div>
-              <label class="mb-1 block text-sm font-medium" for="city">Cidade</label>
-              <input
-                id="city"
-                v-model="filterForm.city"
-                class="w-full rounded-md border px-3 py-2"
-                type="text"
+              <label class="mb-1 block text-sm font-medium" for="state">UF</label>
+              <SearchSelect
+                id="state"
+                v-model="filterForm.state"
+                clearable
+                :options="states"
+                placeholder="UF"
+                search-placeholder="Buscar UF"
               />
             </div>
             <div>
-              <label class="mb-1 block text-sm font-medium" for="state">UF</label>
-              <input
-                id="state"
-                v-model="filterForm.state"
-                class="w-full rounded-md border px-3 py-2 uppercase"
-                maxlength="2"
+              <label class="mb-1 block text-sm font-medium" for="city">Cidade</label>
+              <SearchSelect
+                id="city"
+                v-model="filterForm.city"
+                clearable
+                :disabled="!filterForm.state"
+                :options="cityOptions"
+                :placeholder="filterForm.state ? 'Todas' : 'Selecione UF'"
+                search-placeholder="Buscar cidade"
               />
             </div>
           </div>

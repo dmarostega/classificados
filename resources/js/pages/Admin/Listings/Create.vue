@@ -4,7 +4,13 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import ListingForm from '@/pages/Admin/Listings/components/ListingForm.vue';
 import type { SelectOption, SeoData } from '@/types';
 
-defineProps<{ seo: SeoData; categories: SelectOption[]; statuses: SelectOption[] }>();
+defineProps<{
+  seo: SeoData;
+  categories: SelectOption[];
+  cities: SelectOption[];
+  states: SelectOption[];
+  statuses: SelectOption[];
+}>();
 </script>
 
 <template>
@@ -17,6 +23,8 @@ defineProps<{ seo: SeoData; categories: SelectOption[]; statuses: SelectOption[]
       </div>
       <ListingForm
         :categories="categories"
+        :cities="cities"
+        :states="states"
         :statuses="statuses"
         submit-url="/admin/anuncios"
         method="post"

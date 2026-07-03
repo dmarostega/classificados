@@ -7,6 +7,7 @@ use App\Mail\ListingContactMail;
 use App\Models\Category;
 use App\Models\Listing;
 use App\Services\ListingImageService;
+use App\Services\LocationOptionsService;
 use App\Support\Seo\SeoData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,14 +17,14 @@ use Inertia\Response;
 
 class PublicListingController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, LocationOptionsService $locations): Response
     {
         $filters = $request->only(['category', 'city', 'state', 'q']);
         $listings = Listing::query()
             ->public()
             ->with(['category', 'images.mediaAsset'])
             ->when($filters['category'] ?? null, fn ($query, $slug) => $query->whereRelation('category', 'slug', $slug))
-            ->when($filters['city'] ?? null, fn ($query, $city) => $query->where('city', 'like', "%{$city}%"))
+            ->when($filters['city'] ?? null, fn ($query, $city) => $query->where('city', $city))
             ->when($filters['state'] ?? null, fn ($query, $state) => $query->where('state', strtoupper($state)))
             ->when($filters['q'] ?? null, function ($query, $term): void {
                 $query->where(function ($query) use ($term): void {
@@ -36,9 +37,11 @@ class PublicListingController extends Controller
 
         return Inertia::render('Public/Listings/Index', [
             'categories' => Category::query()->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get(['id', 'name', 'slug']),
+            'cities' => $locations->cities(),
             'filters' => $filters,
             'listings' => $listings->through(fn (Listing $listing): array => $this->listingCard($listing)),
-            'seo' => SeoData::page('Classificados', 'Encontre anúncios publicados por vendedores locais.')->toArray(),
+            'seo' => SeoData::page('Classificados', 'Encontre anuncios publicados por vendedores locais.')->toArray(),
+            'states' => $locations->states(),
         ]);
     }
 

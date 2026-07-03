@@ -1,11 +1,20 @@
 <script setup lang="ts">
 import type { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/vue3';
-import { LayoutDashboard, LogOut, Plus, Search, UserPlus } from '@lucide/vue';
+import {
+  AlertCircle,
+  CheckCircle2,
+  LayoutDashboard,
+  LogOut,
+  Plus,
+  Search,
+  UserPlus,
+} from '@lucide/vue';
 import { computed } from 'vue';
 
 const page = usePage<PageProps>();
 const user = computed(() => page.props.auth.user);
+const flash = computed(() => page.props.flash);
 const logout = (): void => router.post('/logout');
 </script>
 
@@ -59,6 +68,24 @@ const logout = (): void => router.post('/logout');
         </div>
       </nav>
     </header>
-    <main class="mx-auto max-w-7xl px-6 py-8"><slot /></main>
+    <main class="mx-auto max-w-7xl px-6 py-8">
+      <div v-if="flash.success || flash.error" class="mb-6">
+        <div
+          v-if="flash.success"
+          class="flex items-start gap-3 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
+        >
+          <CheckCircle2 class="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{{ flash.success }}</span>
+        </div>
+        <div
+          v-if="flash.error"
+          class="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900"
+        >
+          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{{ flash.error }}</span>
+        </div>
+      </div>
+      <slot />
+    </main>
   </div>
 </template>

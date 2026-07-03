@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Listing;
 use App\Services\ListingImageService;
 use App\Services\ListingService;
+use App\Services\LocationOptionsService;
 use App\Support\Seo\SeoData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,16 +39,18 @@ class ListingController extends Controller
             'filters' => $filters,
             'statuses' => $this->statuses(),
             'listings' => $listings->through(fn (Listing $listing): array => $this->serializeListing($listing)),
-            'seo' => SeoData::page('Meus anúncios')->toArray(),
+            'seo' => SeoData::page('Meus anuncios')->toArray(),
         ]);
     }
 
-    public function create(): Response
+    public function create(LocationOptionsService $locations): Response
     {
         return Inertia::render('Admin/Listings/Create', [
             'categories' => $this->categories(),
+            'cities' => $locations->cities(),
+            'states' => $locations->states(),
             'statuses' => $this->statuses(),
-            'seo' => SeoData::page('Novo anúncio')->toArray(),
+            'seo' => SeoData::page('Novo anuncio')->toArray(),
         ]);
     }
 
@@ -55,10 +58,10 @@ class ListingController extends Controller
     {
         $listing = $service->create($request->user(), $request->validated());
 
-        return redirect()->route('admin.listings.edit', $listing)->with('success', 'Anúncio salvo.');
+        return redirect()->route('admin.listings.edit', $listing)->with('success', 'Anuncio salvo.');
     }
 
-    public function edit(Listing $listing, ListingImageService $images): Response
+    public function edit(Listing $listing, ListingImageService $images, LocationOptionsService $locations): Response
     {
         $this->authorize('update', $listing);
         $listing->load(['category', 'images.mediaAsset']);
@@ -75,8 +78,10 @@ class ListingController extends Controller
                 'images' => $images->serializeImages($listing),
             ],
             'categories' => $this->categories(),
+            'cities' => $locations->cities(),
+            'states' => $locations->states(),
             'statuses' => $this->statuses(),
-            'seo' => SeoData::page('Editar anúncio')->toArray(),
+            'seo' => SeoData::page('Editar anuncio')->toArray(),
         ]);
     }
 
@@ -85,7 +90,7 @@ class ListingController extends Controller
         $this->authorize('update', $listing);
         $service->update($listing, $request->validated());
 
-        return back()->with('success', 'Anúncio atualizado.');
+        return back()->with('success', 'Anuncio atualizado.');
     }
 
     public function destroy(Listing $listing): RedirectResponse
@@ -93,7 +98,7 @@ class ListingController extends Controller
         $this->authorize('delete', $listing);
         $listing->delete();
 
-        return redirect()->route('admin.listings.index')->with('success', 'Anúncio removido.');
+        return redirect()->route('admin.listings.index')->with('success', 'Anuncio removido.');
     }
 
     private function serializeListing(Listing $listing): array

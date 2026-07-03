@@ -1,0 +1,31 @@
+{
+  "states": [
+    { "code": "AC", "name": "Acre", "cities": ["Rio Branco", "Cruzeiro do Sul", "Sena Madureira"] },
+    { "code": "AL", "name": "Alagoas", "cities": ["Maceio", "Arapiraca", "Palmeira dos Indios"] },
+    { "code": "AP", "name": "Amapa", "cities": ["Macapa", "Santana", "Laranjal do Jari"] },
+    { "code": "AM", "name": "Amazonas", "cities": ["Manaus", "Parintins", "Itacoatiara"] },
+    { "code": "BA", "name": "Bahia", "cities": ["Salvador", "Feira de Santana", "Vitoria da Conquista", "Camaçari", "Itabuna"] },
+    { "code": "CE", "name": "Ceara", "cities": ["Fortaleza", "Caucaia", "Juazeiro do Norte", "Sobral"] },
+    { "code": "DF", "name": "Distrito Federal", "cities": ["Brasilia"] },
+    { "code": "ES", "name": "Espirito Santo", "cities": ["Vitoria", "Vila Velha", "Serra", "Cariacica"] },
+    { "code": "GO", "name": "Goias", "cities": ["Goiania", "Aparecida de Goiania", "Anapolis", "Rio Verde"] },
+    { "code": "MA", "name": "Maranhao", "cities": ["Sao Luis", "Imperatriz", "Caxias"] },
+    { "code": "MT", "name": "Mato Grosso", "cities": ["Cuiaba", "Varzea Grande", "Rondonopolis", "Sinop"] },
+    { "code": "MS", "name": "Mato Grosso do Sul", "cities": ["Campo Grande", "Dourados", "Tres Lagoas"] },
+    { "code": "MG", "name": "Minas Gerais", "cities": ["Belo Horizonte", "Uberlandia", "Contagem", "Juiz de Fora", "Betim"] },
+    { "code": "PA", "name": "Para", "cities": ["Belem", "Ananindeua", "Santarem", "Maraba"] },
+    { "code": "PB", "name": "Paraiba", "cities": ["Joao Pessoa", "Campina Grande", "Santa Rita"] },
+    { "code": "PR", "name": "Parana", "cities": ["Curitiba", "Londrina", "Maringa", "Ponta Grossa", "Cascavel", "Foz do Iguacu", "Sao Jose dos Pinhais"] },
+    { "code": "PE", "name": "Pernambuco", "cities": ["Recife", "Jaboatao dos Guararapes", "Olinda", "Caruaru"] },
+    { "code": "PI", "name": "Piaui", "cities": ["Teresina", "Parnaiba", "Picos"] },
+    { "code": "RJ", "name": "Rio de Janeiro", "cities": ["Rio de Janeiro", "Niteroi", "Sao Goncalo", "Duque de Caxias", "Nova Iguacu"] },
+    { "code": "RN", "name": "Rio Grande do Norte", "cities": ["Natal", "Mossoro", "Parnamirim"] },
+    { "code": "RS", "name": "Rio Grande do Sul", "cities": ["Porto Alegre", "Caxias do Sul", "Canoas", "Pelotas", "Santa Maria"] },
+    { "code": "RO", "name": "Rondonia", "cities": ["Porto Velho", "Ji-Parana", "Ariquemes"] },
+    { "code": "RR", "name": "Roraima", "cities": ["Boa Vista", "Rorainopolis", "Caracarai"] },
+    { "code": "SC", "name": "Santa Catarina", "cities": ["Florianopolis", "Joinville", "Blumenau", "Sao Jose", "Chapeco", "Itajai", "Criciuma", "Jaragua do Sul", "Balneario Camboriu", "Palhoca"] },
+    { "code": "SP", "name": "Sao Paulo", "cities": ["Sao Paulo", "Guarulhos", "Campinas", "Santo Andre", "Sao Bernardo do Campo", "Sao Jose dos Campos", "Ribeirao Preto", "Sorocaba", "Osasco"] },
+    { "code": "SE", "name": "Sergipe", "cities": ["Aracaju", "Nossa Senhora do Socorro", "Lagarto"] },
+    { "code": "TO", "name": "Tocantins", "cities": ["Palmas", "Araguaina", "Gurupi"] }
+  ]
+}

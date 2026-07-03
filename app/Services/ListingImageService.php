@@ -40,8 +40,12 @@ class ListingImageService
             ->whereIn('id', $ids)
             ->get()
             ->each(function (ListingImage $image): void {
-                if ($image->mediaAsset) {
-                    $this->media->delete($image->mediaAsset);
+                $asset = $image->mediaAsset;
+
+                $image->delete();
+
+                if ($asset) {
+                    $this->media->delete($asset);
                 }
             });
 
@@ -63,11 +67,14 @@ class ListingImageService
 
     public function serializeImages(Listing $listing): Collection
     {
-        return $listing->images->map(fn (ListingImage $image): array => [
-            'id' => $image->id,
-            'url' => $image->mediaAsset->url,
-            'alt_text' => $image->mediaAsset->alt_text,
-            'is_cover' => $image->is_cover,
-        ]);
+        return $listing->images
+            ->filter(fn (ListingImage $image): bool => $image->mediaAsset !== null)
+            ->map(fn (ListingImage $image): array => [
+                'id' => $image->id,
+                'url' => $image->mediaAsset->url,
+                'alt_text' => $image->mediaAsset->alt_text,
+                'is_cover' => $image->is_cover,
+            ])
+            ->values();
     }
 }

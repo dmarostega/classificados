@@ -34,8 +34,9 @@ export interface SelectOption {
   id?: number;
   name?: string;
   slug?: string;
-  value?: string;
+  value?: string | number;
   label?: string;
+  state_code?: string;
 }
 
 export interface PaginationLink {
