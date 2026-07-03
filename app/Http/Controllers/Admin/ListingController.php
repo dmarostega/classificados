@@ -25,10 +25,14 @@ class ListingController extends Controller
         $listings = Listing::query()
             ->whereBelongsTo($request->user())
             ->with(['category', 'images.mediaAsset'])
-            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->when(
+                $filters['status'] ?? null,
+                fn ($query, $status) => $query->where('status', $status)
+            )
             ->when($filters['q'] ?? null, function ($query, $term): void {
                 $query->where(function ($query) use ($term): void {
-                    $query->where('title', 'like', "%{$term}%")->orWhere('description', 'like', "%{$term}%");
+                    $query->where('title', 'like', "%{$term}%")
+                        ->orWhere('description', 'like', "%{$term}%");
                 });
             })
             ->latest()
@@ -38,7 +42,9 @@ class ListingController extends Controller
         return Inertia::render('Admin/Listings/Index', [
             'filters' => $filters,
             'statuses' => $this->statuses(),
-            'listings' => $listings->through(fn (Listing $listing): array => $this->serializeListing($listing)),
+            'listings' => $listings->through(
+                fn (Listing $listing): array => $this->serializeListing($listing)
+            ),
             'seo' => SeoData::page('Meus anuncios')->toArray(),
         ]);
     }
@@ -58,11 +64,16 @@ class ListingController extends Controller
     {
         $listing = $service->create($request->user(), $request->validated());
 
-        return redirect()->route('admin.listings.edit', $listing)->with('success', 'Anuncio salvo.');
+        return redirect()
+            ->route('admin.listings.edit', $listing)
+            ->with('success', 'Anuncio salvo.');
     }
 
-    public function edit(Listing $listing, ListingImageService $images, LocationOptionsService $locations): Response
-    {
+    public function edit(
+        Listing $listing,
+        ListingImageService $images,
+        LocationOptionsService $locations,
+    ): Response {
         $this->authorize('update', $listing);
         $listing->load(['category', 'images.mediaAsset']);
 
@@ -85,8 +96,11 @@ class ListingController extends Controller
         ]);
     }
 
-    public function update(UpdateListingRequest $request, Listing $listing, ListingService $service): RedirectResponse
-    {
+    public function update(
+        UpdateListingRequest $request,
+        Listing $listing,
+        ListingService $service,
+    ): RedirectResponse {
         $this->authorize('update', $listing);
         $service->update($listing, $request->validated());
 
@@ -98,7 +112,9 @@ class ListingController extends Controller
         $this->authorize('delete', $listing);
         $listing->delete();
 
-        return redirect()->route('admin.listings.index')->with('success', 'Anuncio removido.');
+        return redirect()
+            ->route('admin.listings.index')
+            ->with('success', 'Anuncio removido.');
     }
 
     private function serializeListing(Listing $listing): array
@@ -135,7 +151,10 @@ class ListingController extends Controller
     private function statuses(): array
     {
         return collect(ListingStatus::cases())
-            ->map(fn (ListingStatus $status): array => ['value' => $status->value, 'label' => $status->label()])
+            ->map(fn (ListingStatus $status): array => [
+                'value' => $status->value,
+                'label' => $status->label(),
+            ])
             ->all();
     }
 }
