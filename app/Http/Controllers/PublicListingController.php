@@ -23,12 +23,19 @@ class PublicListingController extends Controller
         $listings = Listing::query()
             ->public()
             ->with(['category', 'images.mediaAsset'])
-            ->when($filters['category'] ?? null, fn ($query, $slug) => $query->whereRelation('category', 'slug', $slug))
+            ->when(
+                $filters['category'] ?? null,
+                fn ($query, $slug) => $query->whereRelation('category', 'slug', $slug)
+            )
             ->when($filters['city'] ?? null, fn ($query, $city) => $query->where('city', $city))
-            ->when($filters['state'] ?? null, fn ($query, $state) => $query->where('state', strtoupper($state)))
+            ->when(
+                $filters['state'] ?? null,
+                fn ($query, $state) => $query->where('state', strtoupper($state))
+            )
             ->when($filters['q'] ?? null, function ($query, $term): void {
                 $query->where(function ($query) use ($term): void {
-                    $query->where('title', 'like', "%{$term}%")->orWhere('description', 'like', "%{$term}%");
+                    $query->where('title', 'like', "%{$term}%")
+                        ->orWhere('description', 'like', "%{$term}%");
                 });
             })
             ->latest('published_at')
@@ -36,11 +43,18 @@ class PublicListingController extends Controller
             ->withQueryString();
 
         return Inertia::render('Public/Listings/Index', [
-            'categories' => Category::query()->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get(['id', 'name', 'slug']),
+            'categories' => Category::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get(['id', 'name', 'slug']),
             'cities' => $locations->cities(),
             'filters' => $filters,
             'listings' => $listings->through(fn (Listing $listing): array => $this->listingCard($listing)),
-            'seo' => SeoData::page('Classificados', 'Encontre anuncios publicados por vendedores locais.')->toArray(),
+            'seo' => SeoData::page(
+                'Classificados',
+                'Encontre anuncios publicados por vendedores locais.',
+            )->toArray(),
             'states' => $locations->states(),
         ]);
     }
@@ -61,7 +75,10 @@ class PublicListingController extends Controller
                 'images' => $images->serializeImages($listing),
                 'views_count' => $listing->views_count,
             ],
-            'seo' => SeoData::page($listing->title, str($listing->description)->limit(150)->toString())->toArray(),
+            'seo' => SeoData::page(
+                $listing->title,
+                str($listing->description)->limit(150)->toString(),
+            )->toArray(),
         ]);
     }
 
