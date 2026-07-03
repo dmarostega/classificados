@@ -11,7 +11,11 @@ class LocationSeeder extends Seeder
 {
     public function run(): void
     {
-        $locations = json_decode(File::get(database_path('seeders/data/locations.json')), true, flags: JSON_THROW_ON_ERROR);
+        $locations = json_decode(
+            File::get(database_path('seeders/data/locations.json')),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
 
         collect($locations['states'])->each(function (array $state, int $index): void {
             State::query()->updateOrCreate(
