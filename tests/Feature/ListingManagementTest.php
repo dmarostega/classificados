@@ -132,7 +132,10 @@ it('emails the advertiser when a public listing receives contact', function (): 
         'message' => 'Tenho interesse no produto anunciado.',
     ])->assertRedirect();
 
-    Mail::assertSent(ListingContactMail::class, fn (ListingContactMail $mail): bool => $mail->hasTo('seller@example.com'));
+    Mail::assertSent(
+        ListingContactMail::class,
+        fn (ListingContactMail $mail): bool => $mail->hasTo('seller@example.com'),
+    );
 });
 
 it('filters public listings by exact city name', function (): void {
