@@ -138,6 +138,75 @@ it('emails the advertiser when a public listing receives contact', function (): 
     );
 });
 
+it('renders listing social meta tags in the initial html with the cover image', function (): void {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+    $category = categoryForListings();
+    $listing = Listing::query()->create([
+        'user_id' => $user->id,
+        'category_id' => $category->id,
+        'title' => 'Bicicleta aro 29',
+        'slug' => 'bicicleta-aro-29',
+        'description' => 'Bicicleta seminova com freio a disco, pronta para uso urbano e trilhas leves.',
+        'price_cents' => 120000,
+        'city' => 'Jaragua do Sul',
+        'state' => 'SC',
+        'contact_name' => 'Anunciante',
+        'status' => ListingStatus::Published,
+        'published_at' => now(),
+    ]);
+    Storage::disk('public')->put('media/share.webp', 'image');
+    $asset = MediaAsset::query()->create([
+        'user_id' => $user->id,
+        'disk' => 'public',
+        'path' => 'media/share.webp',
+        'original_name' => 'share.webp',
+        'mime_type' => 'image/webp',
+        'size' => 5,
+        'kind' => 'image',
+    ]);
+    ListingImage::query()->create([
+        'listing_id' => $listing->id,
+        'media_asset_id' => $asset->id,
+        'sort_order' => 1,
+        'is_cover' => true,
+    ]);
+
+    $this->get("/anuncios/{$listing->id}")->assertOk()
+        ->assertSee('<meta property="og:title" content="Bicicleta aro 29 | Classificados">', false)
+        ->assertSee('<meta property="og:description"', false)
+        ->assertSee('<meta property="og:image" content="http://localhost/storage/media/share.webp">', false)
+        ->assertSee('<meta property="og:url" content="http://localhost/anuncios/'.$listing->id.'">', false)
+        ->assertSee('<meta name="twitter:title" content="Bicicleta aro 29 | Classificados">', false)
+        ->assertSee('<meta name="twitter:description"', false)
+        ->assertSee('<meta name="twitter:image" content="http://localhost/storage/media/share.webp">', false);
+});
+
+it('uses the configured default social image when listing has no image', function (): void {
+    config(['seo.default_image' => '/images/default-share.png']);
+
+    $user = User::factory()->create();
+    $category = categoryForListings();
+    $listing = Listing::query()->create([
+        'user_id' => $user->id,
+        'category_id' => $category->id,
+        'title' => 'Mesa lateral',
+        'slug' => 'mesa-lateral',
+        'description' => 'Mesa lateral em madeira para sala ou quarto.',
+        'price_cents' => 8000,
+        'city' => 'Jaragua do Sul',
+        'state' => 'SC',
+        'contact_name' => 'Anunciante',
+        'status' => ListingStatus::Published,
+        'published_at' => now(),
+    ]);
+
+    $this->get("/anuncios/{$listing->id}")->assertOk()
+        ->assertSee('<meta property="og:image" content="http://localhost/images/default-share.png">', false)
+        ->assertSee('<meta name="twitter:image" content="http://localhost/images/default-share.png">', false);
+});
+
 it('filters public listings by exact city name', function (): void {
     $user = User::factory()->create();
     $category = categoryForListings();

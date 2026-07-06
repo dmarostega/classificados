@@ -66,9 +66,11 @@ class PublicListingController extends Controller
         $listing->increment('views_count');
         $listing->load(['category', 'user', 'images.mediaAsset']);
 
+        $listingCard = $this->listingCard($listing);
+
         return Inertia::render('Public/Listings/Show', [
             'listing' => [
-                ...$this->listingCard($listing),
+                ...$listingCard,
                 'description' => $listing->description,
                 'contact_name' => $listing->contact_name,
                 'contact_phone' => $listing->contact_phone,
@@ -78,6 +80,7 @@ class PublicListingController extends Controller
             'seo' => SeoData::page(
                 $listing->title,
                 str($listing->description)->limit(150)->toString(),
+                $listingCard['cover_url'],
             )->toArray(),
         ]);
     }
