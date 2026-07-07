@@ -3,7 +3,7 @@ import SeoHead from '@/components/SeoHead.vue';
 import { formatPhone, phoneHref } from '@/composables/useInputMasks';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { ListingDetail, SeoData } from '@/types';
-import { useForm } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 import { Mail, Phone } from '@lucide/vue';
 import { computed, ref } from 'vue';
 
@@ -65,6 +65,13 @@ const onPhoneInput = (event: Event): void => {
       <aside class="h-fit rounded-lg border bg-white p-6">
         <h2 class="text-lg font-semibold">Falar com anunciante</h2>
         <p class="mt-1 text-sm text-slate-500">{{ listing.contact_name }}</p>
+        <Link
+          v-if="listing.advertiser"
+          class="mt-3 inline-flex text-sm font-medium underline"
+          :href="listing.advertiser.url"
+        >
+          Ver mais anuncios deste anunciante
+        </Link>
         <a
           v-if="listing.contact_phone"
           class="mt-4 inline-flex items-center gap-2 text-sm font-medium"
