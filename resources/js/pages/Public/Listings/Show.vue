@@ -81,7 +81,10 @@ const onPhoneInput = (event: Event): void => {
           {{ formatPhone(listing.contact_phone) }}
         </a>
 
-        <form class="mt-6 space-y-4" @submit.prevent="form.post(`/anuncios/${listing.id}/contato`)">
+        <form
+          class="mt-6 space-y-4"
+          @submit.prevent="form.post(`/anuncios/${listing.id}/contato`)"
+        >
           <div>
             <label class="mb-1 block text-sm font-medium" for="name">Nome</label>
             <input
