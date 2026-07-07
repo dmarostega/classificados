@@ -74,10 +74,6 @@ class PublicListingController extends Controller
                 'description' => $listing->description,
                 'contact_name' => $listing->contact_name,
                 'contact_phone' => $listing->contact_phone,
-                'advertiser' => [
-                    'name' => $listing->user->name,
-                    'url' => route('advertisers.show', $listing->user),
-                ],
                 'images' => $images->serializeImages($listing),
                 'views_count' => $listing->views_count,
             ],
