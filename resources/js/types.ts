@@ -80,12 +80,18 @@ export interface ListingCard {
   public_url?: string | null;
 }
 
+export interface AdvertiserSummary {
+  name: string;
+  url: string;
+}
+
 export interface ListingDetail extends ListingCard {
   description: string;
   category_id?: number;
   contact_name: string;
   contact_email?: string | null;
   contact_phone: string | null;
+  advertiser?: AdvertiserSummary;
   expires_at?: string | null;
   images: ListingImage[];
   views_count?: number;
