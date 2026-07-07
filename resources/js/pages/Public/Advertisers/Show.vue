@@ -22,9 +22,7 @@ defineProps<{
       <div class="rounded-lg border bg-white p-6">
         <Link class="text-sm font-medium underline" href="/anuncios">Voltar aos anuncios</Link>
         <h1 class="mt-4 text-3xl font-bold">Anuncios de {{ advertiser.name }}</h1>
-        <p class="mt-2 text-sm text-slate-600">
-          Veja anuncios publicados por este anunciante.
-        </p>
+        <p class="mt-2 text-sm text-slate-600">Veja anuncios publicados por este anunciante.</p>
       </div>
 
       <div class="flex items-center justify-between">
@@ -50,7 +48,7 @@ defineProps<{
             </div>
           </div>
           <div class="space-y-2 p-4">
-            <p class="text-xs font-semibold text-slate-500 uppercase">{{ listing.category }}</p>
+            <p class="text-xs font-semibold uppercase text-slate-500">{{ listing.category }}</p>
             <h2 class="line-clamp-2 min-h-12 font-semibold">{{ listing.title }}</h2>
             <p class="text-lg font-bold">{{ listing.price }}</p>
             <p class="text-sm text-slate-500">{{ listing.city }} / {{ listing.state }}</p>
