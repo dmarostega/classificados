@@ -82,7 +82,7 @@ it('shows only public active listings from the advertiser', function (): void {
     ]);
 
     $this->get(route('advertisers.show', $advertiser))->assertOk()
-        ->assertSee('Public/Advertisers/Show')
+        ->assertSee('Public\\/Advertisers\\/Show', false)
         ->assertSee('Loja Central')
         ->assertSee('Sofa publicado')
         ->assertDontSee('Mesa rascunho')
@@ -116,5 +116,5 @@ it('exposes the advertiser page link in public listing detail payload', function
 
     $this->get(route('listings.show', $listing))->assertOk()
         ->assertSee('Vendedor Local')
-        ->assertSee('anunciantes\/'.$advertiser->id, false);
+        ->assertSee('anunciantes\\/'.$advertiser->id, false);
 });
