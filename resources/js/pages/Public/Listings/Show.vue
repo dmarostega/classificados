@@ -52,7 +52,9 @@ const onPhoneInput = (event: Event): void => {
         </div>
 
         <div class="rounded-lg border bg-white p-6">
-          <p class="text-sm font-semibold text-slate-500">{{ listing.category }}</p>
+          <p class="text-sm font-semibold text-slate-500">
+            {{ listing.category }}
+          </p>
           <h1 class="mt-2 text-3xl font-bold">{{ listing.title }}</h1>
           <p class="mt-2 text-2xl font-bold">{{ listing.price }}</p>
           <p class="mt-2 text-sm text-slate-500">{{ listing.city }} / {{ listing.state }}</p>
@@ -81,10 +83,7 @@ const onPhoneInput = (event: Event): void => {
           {{ formatPhone(listing.contact_phone) }}
         </a>
 
-        <form
-          class="mt-6 space-y-4"
-          @submit.prevent="form.post(`/anuncios/${listing.id}/contato`)"
-        >
+        <form class="mt-6 space-y-4" @submit.prevent="form.post(`/anuncios/${listing.id}/contato`)">
           <div>
             <label class="mb-1 block text-sm font-medium" for="name">Nome</label>
             <input
@@ -94,7 +93,9 @@ const onPhoneInput = (event: Event): void => {
               class="w-full rounded-md border px-3 py-2"
               type="text"
             />
-            <p v-if="form.errors.name" class="text-sm text-red-700">{{ form.errors.name }}</p>
+            <p v-if="form.errors.name" class="text-sm text-red-700">
+              {{ form.errors.name }}
+            </p>
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium" for="email">E-mail</label>
@@ -105,7 +106,9 @@ const onPhoneInput = (event: Event): void => {
               class="w-full rounded-md border px-3 py-2"
               type="email"
             />
-            <p v-if="form.errors.email" class="text-sm text-red-700">{{ form.errors.email }}</p>
+            <p v-if="form.errors.email" class="text-sm text-red-700">
+              {{ form.errors.email }}
+            </p>
           </div>
           <div>
             <label class="mb-1 block text-sm font-medium" for="phone">Telefone</label>
@@ -127,7 +130,9 @@ const onPhoneInput = (event: Event): void => {
               required
               class="min-h-32 w-full rounded-md border px-3 py-2"
             />
-            <p v-if="form.errors.message" class="text-sm text-red-700">{{ form.errors.message }}</p>
+            <p v-if="form.errors.message" class="text-sm text-red-700">
+              {{ form.errors.message }}
+            </p>
           </div>
           <button
             class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-slate-900 px-4 py-2 font-medium text-white"

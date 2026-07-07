@@ -48,8 +48,12 @@ defineProps<{
             </div>
           </div>
           <div class="space-y-2 p-4">
-            <p class="text-xs font-semibold uppercase text-slate-500">{{ listing.category }}</p>
-            <h2 class="line-clamp-2 min-h-12 font-semibold">{{ listing.title }}</h2>
+            <p class="text-xs font-semibold uppercase text-slate-500">
+              {{ listing.category }}
+            </p>
+            <h2 class="line-clamp-2 min-h-12 font-semibold">
+              {{ listing.title }}
+            </h2>
             <p class="text-lg font-bold">{{ listing.price }}</p>
             <p class="text-sm text-slate-500">{{ listing.city }} / {{ listing.state }}</p>
           </div>
