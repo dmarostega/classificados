@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Listing;
 use App\Models\User;
+use App\Services\ListingImageService;
 use App\Support\Seo\SeoData;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PublicAdvertiserController extends Controller
 {
-    public function __invoke(User $user): Response
+    public function __invoke(User $user, ListingImageService $images): Response
     {
         $listings = Listing::query()
             ->public()
@@ -29,16 +30,16 @@ class PublicAdvertiserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
             ],
-            'listings' => $listings->through(fn (Listing $listing): array => $this->listingCard($listing)),
+            'listings' => $listings->through(fn (Listing $listing): array => $this->listingCard($listing, $images)),
             'seo' => SeoData::page(
                 "Anuncios de {$user->name}",
                 "Veja anuncios publicados por {$user->name} no Classificados.",
-                $firstListing ? $this->listingCoverUrl($firstListing) : null,
+                $firstListing ? $images->coverUrl($firstListing) : null,
             )->toArray(),
         ]);
     }
 
-    private function listingCard(Listing $listing): array
+    private function listingCard(Listing $listing, ListingImageService $images): array
     {
         return [
             'id' => $listing->id,
@@ -50,14 +51,7 @@ class PublicAdvertiserController extends Controller
             'state' => $listing->state,
             'published_at' => $listing->published_at?->toDateString(),
             'url' => route('listings.show', $listing),
-            'cover_url' => $this->listingCoverUrl($listing),
+            'cover_url' => $images->coverUrl($listing),
         ];
-    }
-
-    private function listingCoverUrl(Listing $listing): ?string
-    {
-        $cover = $listing->images->firstWhere('is_cover', true) ?: $listing->images->first();
-
-        return $cover?->mediaAsset?->url;
     }
 }

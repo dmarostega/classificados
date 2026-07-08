@@ -9,6 +9,7 @@ use App\Models\MediaAsset;
 use App\Models\User;
 use App\Services\ListingImageService;
 use Database\Seeders\LocationSeeder;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
@@ -207,6 +208,62 @@ it('uses the configured default social image when listing has no image', functio
         ->assertSee('<meta name="twitter:image" content="http://localhost/images/default-share.png">', false);
 });
 
+it('ignores missing storage files when rendering public listing images', function (): void {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+    $category = categoryForListings();
+    $listing = Listing::query()->create([
+        'user_id' => $user->id,
+        'category_id' => $category->id,
+        'title' => 'Renault Clio Campus',
+        'slug' => 'renault-clio-campus',
+        'description' => 'Carro conservado para venda local.',
+        'price_cents' => 1800000,
+        'city' => 'Jaragua do Sul',
+        'state' => 'SC',
+        'contact_name' => 'Anunciante',
+        'status' => ListingStatus::Published,
+        'published_at' => now(),
+    ]);
+    $missingAsset = MediaAsset::query()->create([
+        'user_id' => $user->id,
+        'disk' => 'public',
+        'path' => 'media/2026/07/missing.webp',
+        'original_name' => 'missing.webp',
+        'mime_type' => 'image/webp',
+        'size' => 5,
+        'kind' => 'image',
+    ]);
+    Storage::disk('public')->put('media/2026/07/current.webp', 'image');
+    $currentAsset = MediaAsset::query()->create([
+        'user_id' => $user->id,
+        'disk' => 'public',
+        'path' => 'media/2026/07/current.webp',
+        'original_name' => 'current.webp',
+        'mime_type' => 'image/webp',
+        'size' => 5,
+        'kind' => 'image',
+    ]);
+    ListingImage::query()->create([
+        'listing_id' => $listing->id,
+        'media_asset_id' => $missingAsset->id,
+        'sort_order' => 1,
+        'is_cover' => true,
+    ]);
+    ListingImage::query()->create([
+        'listing_id' => $listing->id,
+        'media_asset_id' => $currentAsset->id,
+        'sort_order' => 2,
+        'is_cover' => false,
+    ]);
+
+    $this->get("/anuncios/{$listing->id}")->assertOk()
+        ->assertDontSee('/storage/media/2026/07/missing.webp')
+        ->assertSee('/storage/media/2026/07/current.webp')
+        ->assertSee('<meta property="og:image" content="http://localhost/storage/media/2026/07/current.webp">', false);
+});
+
 it('filters public listings by exact city name', function (): void {
     $user = User::factory()->create();
     $category = categoryForListings();
@@ -284,11 +341,136 @@ it('removes listing image links and media assets when updating a listing', funct
     Storage::disk('public')->assertMissing('media/test.webp');
 });
 
+it('promotes the first available image when the current cover file is missing', function (): void {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+    $category = categoryForListings();
+    $listing = Listing::query()->create([
+        'user_id' => $user->id,
+        'category_id' => $category->id,
+        'title' => 'Renault Clio',
+        'slug' => 'renault-clio-cover',
+        'description' => 'Carro conservado para venda local.',
+        'price_cents' => 1800000,
+        'city' => 'Jaragua do Sul',
+        'state' => 'SC',
+        'contact_name' => 'Anunciante',
+        'status' => ListingStatus::Draft,
+    ]);
+    $missingAsset = MediaAsset::query()->create([
+        'user_id' => $user->id,
+        'disk' => 'public',
+        'path' => 'media/missing-cover.webp',
+        'original_name' => 'missing-cover.webp',
+        'mime_type' => 'image/webp',
+        'size' => 5,
+        'kind' => 'image',
+    ]);
+    Storage::disk('public')->put('media/current-cover.webp', 'image');
+    $currentAsset = MediaAsset::query()->create([
+        'user_id' => $user->id,
+        'disk' => 'public',
+        'path' => 'media/current-cover.webp',
+        'original_name' => 'current-cover.webp',
+        'mime_type' => 'image/webp',
+        'size' => 5,
+        'kind' => 'image',
+    ]);
+    $missingImage = ListingImage::query()->create([
+        'listing_id' => $listing->id,
+        'media_asset_id' => $missingAsset->id,
+        'sort_order' => 1,
+        'is_cover' => true,
+    ]);
+    $currentImage = ListingImage::query()->create([
+        'listing_id' => $listing->id,
+        'media_asset_id' => $currentAsset->id,
+        'sort_order' => 2,
+        'is_cover' => false,
+    ]);
+
+    app(ListingImageService::class)->ensureCoverImage($listing);
+
+    expect($missingImage->fresh()->is_cover)->toBeFalse()
+        ->and($currentImage->fresh()->is_cover)->toBeTrue();
+});
+
+it('marks a new upload as cover when the existing cover file is missing', function (): void {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+    $category = categoryForListings();
+    $listing = Listing::query()->create([
+        'user_id' => $user->id,
+        'category_id' => $category->id,
+        'title' => 'Renault Clio Upload',
+        'slug' => 'renault-clio-upload',
+        'description' => 'Carro conservado para venda local.',
+        'price_cents' => 1800000,
+        'city' => 'Jaragua do Sul',
+        'state' => 'SC',
+        'contact_name' => 'Anunciante',
+        'status' => ListingStatus::Draft,
+    ]);
+    $missingAsset = MediaAsset::query()->create([
+        'user_id' => $user->id,
+        'disk' => 'public',
+        'path' => 'media/missing-upload-cover.webp',
+        'original_name' => 'missing-upload-cover.webp',
+        'mime_type' => 'image/webp',
+        'size' => 5,
+        'kind' => 'image',
+    ]);
+    $missingImage = ListingImage::query()->create([
+        'listing_id' => $listing->id,
+        'media_asset_id' => $missingAsset->id,
+        'sort_order' => 1,
+        'is_cover' => true,
+    ]);
+
+    app(ListingImageService::class)->attachUploadedImages($listing, $user, [
+        UploadedFile::fake()->image('current.jpg', 640, 480),
+    ]);
+
+    $newImage = ListingImage::query()
+        ->where('listing_id', $listing->id)
+        ->whereKeyNot($missingImage->id)
+        ->sole();
+
+    expect($missingImage->fresh()->is_cover)->toBeFalse()
+        ->and($newImage->is_cover)->toBeTrue();
+});
+
 it('ignores listing images without media assets when serializing', function (): void {
     $listing = new Listing;
     $listing->setRelation('images', collect([
         new ListingImage(['id' => 1, 'is_cover' => true]),
     ]));
+
+    $images = app(ListingImageService::class)->serializeImages($listing);
+
+    expect($images)->toHaveCount(0);
+});
+
+it('ignores listing images with missing storage files when serializing', function (): void {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+    $listing = new Listing;
+    $missingAsset = MediaAsset::query()->create([
+        'user_id' => $user->id,
+        'disk' => 'public',
+        'path' => 'media/missing.webp',
+        'original_name' => 'missing.webp',
+        'mime_type' => 'image/webp',
+        'size' => 5,
+        'kind' => 'image',
+    ]);
+    $listing->setRelation('images', collect([
+        new ListingImage(['id' => 1, 'media_asset_id' => $missingAsset->id, 'is_cover' => true]),
+    ]));
+    $listing->images->first()->setRelation('mediaAsset', $missingAsset);
 
     $images = app(ListingImageService::class)->serializeImages($listing);
 

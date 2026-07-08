@@ -29,4 +29,9 @@ class MediaAsset extends Model
     {
         return Storage::disk($this->disk)->url($this->path);
     }
+
+    public function existsOnDisk(): bool
+    {
+        return Storage::disk($this->disk)->exists($this->path);
+    }
 }
