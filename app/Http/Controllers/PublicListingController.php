@@ -17,8 +17,11 @@ use Inertia\Response;
 
 class PublicListingController extends Controller
 {
-    public function index(Request $request, LocationOptionsService $locations): Response
-    {
+    public function index(
+        Request $request,
+        LocationOptionsService $locations,
+        ListingImageService $images,
+    ): Response {
         $filters = $request->only(['category', 'city', 'state', 'q']);
         $listings = Listing::query()
             ->public()
@@ -50,7 +53,7 @@ class PublicListingController extends Controller
                 ->get(['id', 'name', 'slug']),
             'cities' => $locations->cities(),
             'filters' => $filters,
-            'listings' => $listings->through(fn (Listing $listing): array => $this->listingCard($listing)),
+            'listings' => $listings->through(fn (Listing $listing): array => $this->listingCard($listing, $images)),
             'seo' => SeoData::page(
                 'Classificados',
                 'Encontre anuncios publicados por vendedores locais.',
@@ -66,7 +69,7 @@ class PublicListingController extends Controller
         $listing->increment('views_count');
         $listing->load(['category', 'user', 'images.mediaAsset']);
 
-        $listingCard = $this->listingCard($listing);
+        $listingCard = $this->listingCard($listing, $images);
 
         return Inertia::render('Public/Listings/Show', [
             'listing' => [
@@ -99,10 +102,8 @@ class PublicListingController extends Controller
         return back()->with('success', 'Mensagem enviada ao anunciante.');
     }
 
-    private function listingCard(Listing $listing): array
+    private function listingCard(Listing $listing, ListingImageService $images): array
     {
-        $cover = $listing->images->firstWhere('is_cover', true) ?: $listing->images->first();
-
         return [
             'id' => $listing->id,
             'title' => $listing->title,
@@ -113,7 +114,7 @@ class PublicListingController extends Controller
             'state' => $listing->state,
             'published_at' => $listing->published_at?->toDateString(),
             'url' => route('listings.show', $listing),
-            'cover_url' => $cover?->mediaAsset?->url,
+            'cover_url' => $images->coverUrl($listing),
         ];
     }
 }

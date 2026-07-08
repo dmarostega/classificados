@@ -67,14 +67,31 @@ class ListingImageService
 
     public function serializeImages(Listing $listing): Collection
     {
-        return $listing->images
-            ->filter(fn (ListingImage $image): bool => $image->mediaAsset !== null)
+        return $this->availableImages($listing)
             ->map(fn (ListingImage $image): array => [
                 'id' => $image->id,
                 'url' => $image->mediaAsset->url,
                 'alt_text' => $image->mediaAsset->alt_text,
                 'is_cover' => $image->is_cover,
             ])
+            ->values();
+    }
+
+    public function coverUrl(Listing $listing): ?string
+    {
+        $images = $this->availableImages($listing);
+        $cover = $images->firstWhere('is_cover', true) ?: $images->first();
+
+        return $cover?->mediaAsset?->url;
+    }
+
+    private function availableImages(Listing $listing): Collection
+    {
+        return $listing->images
+            ->filter(
+                fn (ListingImage $image): bool => $image->mediaAsset !== null
+                    && $image->mediaAsset->existsOnDisk()
+            )
             ->values();
     }
 }

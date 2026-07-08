@@ -19,7 +19,7 @@ use Inertia\Response;
 
 class ListingController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, ListingImageService $images): Response
     {
         $filters = $request->only(['status', 'q']);
         $listings = Listing::query()
@@ -43,7 +43,7 @@ class ListingController extends Controller
             'filters' => $filters,
             'statuses' => $this->statuses(),
             'listings' => $listings->through(
-                fn (Listing $listing): array => $this->serializeListing($listing)
+                fn (Listing $listing): array => $this->serializeListing($listing, $images)
             ),
             'seo' => SeoData::page('Meus anuncios')->toArray(),
         ]);
@@ -79,7 +79,7 @@ class ListingController extends Controller
 
         return Inertia::render('Admin/Listings/Edit', [
             'listing' => [
-                ...$this->serializeListing($listing),
+                ...$this->serializeListing($listing, $images),
                 'description' => $listing->description,
                 'category_id' => $listing->category_id,
                 'contact_name' => $listing->contact_name,
@@ -117,10 +117,8 @@ class ListingController extends Controller
             ->with('success', 'Anuncio removido.');
     }
 
-    private function serializeListing(Listing $listing): array
+    private function serializeListing(Listing $listing, ListingImageService $images): array
     {
-        $cover = $listing->images->firstWhere('is_cover', true) ?: $listing->images->first();
-
         return [
             'id' => $listing->id,
             'title' => $listing->title,
@@ -132,7 +130,7 @@ class ListingController extends Controller
             'status' => $listing->status->value,
             'status_label' => $listing->status->label(),
             'published_at' => $listing->published_at?->toDateString(),
-            'cover_url' => $cover?->mediaAsset?->url,
+            'cover_url' => $images->coverUrl($listing),
             'edit_url' => route('admin.listings.edit', $listing),
             'public_url' => $listing->status->isPublic() ? route('listings.show', $listing) : null,
         ];
