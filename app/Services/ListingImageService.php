@@ -16,18 +16,24 @@ class ListingImageService
     public function attachUploadedImages(Listing $listing, User $user, array $files): void
     {
         $nextOrder = (int) $listing->images()->max('sort_order') + 1;
-        $hasCover = $listing->images()->where('is_cover', true)->exists();
+        $hasCover = $this->hasAvailableCoverImage($listing);
+
+        if (! $hasCover) {
+            $this->clearCoverFlags($listing);
+        }
 
         foreach ($files as $file) {
             $asset = $this->media->store($file, $user, $listing->title);
+            $isCover = ! $hasCover;
 
             ListingImage::create([
                 'listing_id' => $listing->id,
                 'media_asset_id' => $asset->id,
                 'sort_order' => $nextOrder,
-                'is_cover' => ! $hasCover && $nextOrder === 1,
+                'is_cover' => $isCover,
             ]);
 
+            $hasCover = true;
             $nextOrder++;
         }
     }
@@ -54,11 +60,13 @@ class ListingImageService
 
     public function ensureCoverImage(Listing $listing): void
     {
-        if ($listing->images()->where('is_cover', true)->exists()) {
+        if ($this->hasAvailableCoverImage($listing)) {
             return;
         }
 
-        $first = $listing->images()->orderBy('sort_order')->first();
+        $this->clearCoverFlags($listing);
+
+        $first = $this->availableImagesFromQuery($listing)->first();
 
         if ($first) {
             $first->update(['is_cover' => true]);
@@ -87,11 +95,37 @@ class ListingImageService
 
     private function availableImages(Listing $listing): Collection
     {
-        return $listing->images
+        return $this->filterAvailableImages($listing->images);
+    }
+
+    private function availableImagesFromQuery(Listing $listing, bool $onlyCover = false): Collection
+    {
+        $query = $listing->images()->with('mediaAsset');
+
+        if ($onlyCover) {
+            $query->where('is_cover', true);
+        }
+
+        return $this->filterAvailableImages($query->get());
+    }
+
+    private function filterAvailableImages(Collection $images): Collection
+    {
+        return $images
             ->filter(
                 fn (ListingImage $image): bool => $image->mediaAsset !== null
                     && $image->mediaAsset->existsOnDisk()
             )
             ->values();
+    }
+
+    private function hasAvailableCoverImage(Listing $listing): bool
+    {
+        return $this->availableImagesFromQuery($listing, onlyCover: true)->isNotEmpty();
+    }
+
+    private function clearCoverFlags(Listing $listing): void
+    {
+        $listing->images()->where('is_cover', true)->update(['is_cover' => false]);
     }
 }
