@@ -17,12 +17,13 @@ defineProps<{ listings: Paginated<ListingCardData> }>();
           <Heart class="h-6 w-6 text-rose-700" />
           <h1 class="text-2xl font-bold">Meus favoritos</h1>
         </div>
-        <p class="mt-2 text-sm text-slate-600">
-          Acompanhe os anuncios que voce salvou.
-        </p>
+        <p class="mt-2 text-sm text-slate-600">Acompanhe os anuncios que voce salvou.</p>
       </header>
 
-      <div v-if="listings.data.length" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div
+        v-if="listings.data.length"
+        class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      >
         <ListingCard v-for="listing in listings.data" :key="listing.id" :listing="listing" />
       </div>
 

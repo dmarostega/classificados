@@ -123,11 +123,7 @@ watch(
         </div>
 
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <ListingCardItem
-            v-for="listing in listings.data"
-            :key="listing.id"
-            :listing="listing"
-          />
+          <ListingCardItem v-for="listing in listings.data" :key="listing.id" :listing="listing" />
         </div>
 
         <p
