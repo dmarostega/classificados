@@ -7,7 +7,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ListingFavorite extends Model
 {
-    protected $fillable = ['user_id', 'listing_id'];
+    protected $fillable = [
+        'user_id',
+        'listing_id',
+        'email_notifications_enabled',
+        'last_notification_sent_at',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'email_notifications_enabled' => 'boolean',
+            'last_notification_sent_at' => 'datetime',
+        ];
+    }
 
     public function user(): BelongsTo
     {

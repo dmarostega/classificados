@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ListingController;
 use App\Http\Controllers\AuthPageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FavoriteNotificationController;
 use App\Http\Controllers\GrowthEventController;
 use App\Http\Controllers\ListingFavoriteController;
 use App\Http\Controllers\ListingPhoneController;
@@ -22,6 +23,9 @@ Route::get('/anunciantes/{advertiser}', PublicAdvertiserController::class)->name
 Route::post('/anuncios/{listing:slug}/contato', [PublicListingController::class, 'contact'])->middleware('throttle:10,1')->name('listings.contact');
 Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::post('/growth/events', [GrowthEventController::class, 'store'])->middleware('throttle:120,1')->name('growth.events.store');
+Route::get('/favoritos/notificacoes/{favorite}/cancelar', FavoriteNotificationController::class)
+    ->middleware('signed')
+    ->name('favorite-notifications.unsubscribe');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthPageController::class, 'login'])->name('login');
