@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SeoHead from '@/components/SeoHead.vue';
-import { formatPhone, phoneHref } from '@/composables/useInputMasks';
+import { formatPhone } from '@/composables/useInputMasks';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { ListingDetail, SeoData } from '@/types';
 import { Link, useForm } from '@inertiajs/vue3';
@@ -74,16 +74,18 @@ const onPhoneInput = (event: Event): void => {
         >
           Ver mais anuncios deste anunciante
         </Link>
-        <a
-          v-if="listing.contact_phone"
+        <p
+          v-if="listing.contact_phone_masked"
           class="mt-4 inline-flex items-center gap-2 text-sm font-medium"
-          :href="phoneHref(listing.contact_phone)"
         >
           <Phone class="h-4 w-4" />
-          {{ formatPhone(listing.contact_phone) }}
-        </a>
+          {{ listing.contact_phone_masked }}
+        </p>
 
-        <form class="mt-6 space-y-4" @submit.prevent="form.post(`/anuncios/${listing.id}/contato`)">
+        <form
+          class="mt-6 space-y-4"
+          @submit.prevent="form.post(`/anuncios/${listing.slug}/contato`)"
+        >
           <div>
             <label class="mb-1 block text-sm font-medium" for="name">Nome</label>
             <input

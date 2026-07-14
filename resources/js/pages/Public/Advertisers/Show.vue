@@ -10,6 +10,7 @@ defineProps<{
   advertiser: {
     id: number;
     name: string;
+    slug: string;
   };
   listings: Paginated<ListingCard>;
 }>();

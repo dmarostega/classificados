@@ -62,8 +62,17 @@ class PublicListingController extends Controller
         ]);
     }
 
-    public function show(Listing $listing, ListingImageService $images): Response
+    public function show(string $listing, ListingImageService $images): Response|RedirectResponse
     {
+        if (ctype_digit($listing)) {
+            $listing = Listing::query()->findOrFail($listing);
+
+            abort_unless($listing->isPubliclyVisible(), 404);
+
+            return redirect()->route('listings.show', $listing->slug, 301);
+        }
+
+        $listing = Listing::query()->where('slug', $listing)->firstOrFail();
         abort_unless($listing->isPubliclyVisible(), 404);
 
         $listing->increment('views_count');
@@ -76,10 +85,10 @@ class PublicListingController extends Controller
                 ...$listingCard,
                 'description' => $listing->description,
                 'contact_name' => $listing->contact_name,
-                'contact_phone' => $listing->contact_phone,
+                'contact_phone_masked' => $listing->maskedContactPhone(),
                 'advertiser' => [
                     'name' => $listing->user->name,
-                    'url' => route('advertisers.show', $listing->user),
+                    'url' => route('advertisers.show', $listing->user->slug),
                 ],
                 'images' => $images->serializeImages($listing),
                 'views_count' => $listing->views_count,
@@ -113,7 +122,7 @@ class PublicListingController extends Controller
             'city' => $listing->city,
             'state' => $listing->state,
             'published_at' => $listing->published_at?->toDateString(),
-            'url' => route('listings.show', $listing),
+            'url' => route('listings.show', $listing->slug),
             'cover_url' => $images->coverUrl($listing),
         ];
     }
