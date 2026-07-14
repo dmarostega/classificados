@@ -9,5 +9,6 @@
 7. Remover todas as imagens de um anuncio, adicionar uma nova, publicar e confirmar que lista, detalhe e tags sociais usam somente a imagem existente em `storage/app/public`.
 8. Publicar o anuncio e validar busca, filtro por categoria/cidade/UF e pagina de detalhe em `/anuncios`.
 9. Enviar contato no detalhe e conferir entrega pelo mailer configurado, inicialmente `log`.
-10. No detalhe publico do anuncio, clicar em "Ver mais anuncios deste anunciante" e confirmar que `/anunciantes/{id}` lista somente os anuncios publicados, ativos e nao expirados daquele usuario, sem exibir e-mail ou dados privados da conta.
-11. Criar outro usuario e validar isolamento: ele nao deve editar, excluir ou listar anuncios do primeiro usuario.
+10. No detalhe publico do anuncio, confirmar que o telefone aparece mascarado, sem link telefonico, e clicar em "Ver mais anuncios deste anunciante"; validar que `/anunciantes/{slug}` lista somente os anuncios publicados, ativos e nao expirados daquele usuario, sem exibir e-mail ou dados privados da conta.
+11. Acessar `/anunciantes/{id}` e confirmar o redirecionamento permanente para `/anunciantes/{slug}`.
+12. Criar outro usuario e validar isolamento: ele nao deve editar, excluir ou listar anuncios do primeiro usuario.

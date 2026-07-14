@@ -90,7 +90,8 @@ export interface ListingDetail extends ListingCard {
   category_id?: number;
   contact_name: string;
   contact_email?: string | null;
-  contact_phone: string | null;
+  contact_phone?: string | null;
+  contact_phone_masked?: string | null;
   advertiser?: AdvertiserSummary;
   expires_at?: string | null;
   images: ListingImage[];

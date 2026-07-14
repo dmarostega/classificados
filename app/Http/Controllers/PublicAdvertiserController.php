@@ -6,13 +6,21 @@ use App\Models\Listing;
 use App\Models\User;
 use App\Services\ListingImageService;
 use App\Support\Seo\SeoData;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PublicAdvertiserController extends Controller
 {
-    public function __invoke(User $user, ListingImageService $images): Response
+    public function __invoke(string $advertiser, ListingImageService $images): Response|RedirectResponse
     {
+        if (ctype_digit($advertiser)) {
+            $user = User::query()->findOrFail($advertiser);
+
+            return redirect()->route('advertisers.show', $user->slug, 301);
+        }
+
+        $user = User::query()->where('slug', $advertiser)->firstOrFail();
         $listings = Listing::query()
             ->public()
             ->whereBelongsTo($user)
@@ -29,6 +37,7 @@ class PublicAdvertiserController extends Controller
             'advertiser' => [
                 'id' => $user->id,
                 'name' => $user->name,
+                'slug' => $user->slug,
             ],
             'listings' => $listings->through(fn (Listing $listing): array => $this->listingCard($listing, $images)),
             'seo' => SeoData::page(

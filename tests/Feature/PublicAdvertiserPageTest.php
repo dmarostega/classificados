@@ -81,12 +81,12 @@ it('shows only public active listings from the advertiser', function (): void {
         'published_at' => now(),
     ]);
 
-    $this->get(route('advertisers.show', $advertiser))->assertOk()
+    $this->get(route('advertisers.show', $advertiser->slug))->assertOk()
         ->assertSee('Public\\/Advertisers\\/Show', false)
         ->assertSee('Loja Central')
         ->assertSee('<title inertia>Anuncios de Loja Central | Classificados</title>', false)
         ->assertSee('<meta name="description" content="Veja anuncios publicados por Loja Central no Classificados.">', false)
-        ->assertSee('<link rel="canonical" href="http://localhost/anunciantes/'.$advertiser->id.'">', false)
+        ->assertSee('<link rel="canonical" href="http://localhost/anunciantes/'.$advertiser->slug.'">', false)
         ->assertSee('<meta name="robots" content="index,follow">', false)
         ->assertSee('Sofa publicado')
         ->assertDontSee('Mesa rascunho')
@@ -98,7 +98,19 @@ it('shows only public active listings from the advertiser', function (): void {
 it('returns not found when advertiser has no public listings', function (): void {
     $advertiser = User::factory()->create();
 
-    $this->get(route('advertisers.show', $advertiser))->assertNotFound();
+    $this->get(route('advertisers.show', $advertiser->slug))->assertNotFound();
+});
+
+it('generates unique advertiser slugs and redirects the legacy url', function (): void {
+    $advertiser = User::factory()->create(['name' => 'Loja Central']);
+    $advertiserWithSameName = User::factory()->create(['name' => 'Loja Central']);
+
+    expect($advertiser->slug)->toBe('loja-central')
+        ->and($advertiserWithSameName->slug)->toBe('loja-central-2');
+
+    $this->get(route('advertisers.show', $advertiser->id))
+        ->assertRedirect(route('advertisers.show', $advertiser->slug))
+        ->assertStatus(301);
 });
 
 it('exposes the advertiser page link in public listing detail payload', function (): void {
@@ -114,11 +126,15 @@ it('exposes the advertiser page link in public listing detail payload', function
         'city' => 'Jaragua do Sul',
         'state' => 'SC',
         'contact_name' => 'Vendedor Local',
+        'contact_phone' => '(47) 99999-1234',
         'status' => ListingStatus::Published,
         'published_at' => now(),
     ]);
 
     $this->get(route('listings.show', $listing))->assertOk()
         ->assertSee('Vendedor Local')
-        ->assertSee('anunciantes\\/'.$advertiser->id, false);
+        ->assertSee('anunciantes\\/'.$advertiser->slug, false)
+        ->assertSee('(47) 9****-1234')
+        ->assertDontSee('(47) 99999-1234')
+        ->assertDontSee('tel:');
 });

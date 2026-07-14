@@ -76,10 +76,10 @@ class PublicListingController extends Controller
                 ...$listingCard,
                 'description' => $listing->description,
                 'contact_name' => $listing->contact_name,
-                'contact_phone' => $listing->contact_phone,
+                'contact_phone_masked' => $listing->maskedContactPhone(),
                 'advertiser' => [
                     'name' => $listing->user->name,
-                    'url' => route('advertisers.show', $listing->user),
+                    'url' => route('advertisers.show', $listing->user->slug),
                 ],
                 'images' => $images->serializeImages($listing),
                 'views_count' => $listing->views_count,

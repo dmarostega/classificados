@@ -86,4 +86,23 @@ class Listing extends Model
     {
         return 'R$ '.number_format($this->price_cents / 100, 2, ',', '.');
     }
+
+    public function maskedContactPhone(): ?string
+    {
+        $digits = preg_replace('/\D/', '', (string) $this->contact_phone);
+
+        if ($digits === '') {
+            return null;
+        }
+
+        if (strlen($digits) === 11) {
+            return sprintf('(%s) %s****-%s', substr($digits, 0, 2), $digits[2], substr($digits, -4));
+        }
+
+        if (strlen($digits) === 10) {
+            return sprintf('(%s) ****-%s', substr($digits, 0, 2), substr($digits, -4));
+        }
+
+        return str_repeat('*', max(strlen($digits) - 4, 0)).substr($digits, -4);
+    }
 }
