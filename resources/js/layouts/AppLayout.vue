@@ -4,6 +4,7 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import {
   AlertCircle,
   CheckCircle2,
+  Heart,
   LayoutDashboard,
   LogOut,
   Plus,
@@ -32,6 +33,13 @@ const logout = (): void => router.post('/logout');
             Anuncios
           </Link>
           <template v-if="user">
+            <Link
+              class="inline-flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100"
+              href="/favoritos"
+            >
+              <Heart class="h-4 w-4" />
+              Favoritos
+            </Link>
             <Link
               class="inline-flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100"
               href="/dashboard"

@@ -55,6 +55,11 @@ class Listing extends Model
         return $this->hasMany(ListingImage::class)->orderBy('sort_order');
     }
 
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(ListingFavorite::class);
+    }
+
     public function coverImage(): HasMany
     {
         return $this->images()->where('is_cover', true);

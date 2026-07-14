@@ -27,6 +27,12 @@ class PublicListingController extends Controller
             ->public()
             ->with(['category', 'images.mediaAsset'])
             ->when(
+                $request->user(),
+                fn ($query, $user) => $query->withExists([
+                    'favorites as is_favorited' => fn ($query) => $query->where('user_id', $user->id),
+                ])
+            )
+            ->when(
                 $filters['category'] ?? null,
                 fn ($query, $slug) => $query->whereRelation('category', 'slug', $slug)
             )
@@ -62,7 +68,7 @@ class PublicListingController extends Controller
         ]);
     }
 
-    public function show(string $listing, ListingImageService $images): Response|RedirectResponse
+    public function show(Request $request, string $listing, ListingImageService $images): Response|RedirectResponse
     {
         if (ctype_digit($listing)) {
             $listing = Listing::query()->findOrFail($listing);
@@ -92,6 +98,9 @@ class PublicListingController extends Controller
                 ],
                 'images' => $images->serializeImages($listing),
                 'views_count' => $listing->views_count,
+                'is_favorited' => $request->user()
+                    ? $listing->favorites()->whereBelongsTo($request->user())->exists()
+                    : false,
             ],
             'seo' => SeoData::page(
                 $listing->title,
@@ -124,6 +133,7 @@ class PublicListingController extends Controller
             'published_at' => $listing->published_at?->toDateString(),
             'url' => route('listings.show', $listing->slug),
             'cover_url' => $images->coverUrl($listing),
+            'is_favorited' => (bool) ($listing->is_favorited ?? false),
         ];
     }
 }
