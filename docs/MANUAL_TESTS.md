@@ -22,3 +22,5 @@
 20. Com um worker de fila ativo, editar titulo, categoria, descricao, preco, cidade/UF ou imagens de um anuncio publico favoritado e confirmar que o interessado recebe um unico e-mail; alterar apenas contato, validade ou status nao deve enviar aviso.
 21. Confirmar que o anunciante nao recebe aviso do proprio anuncio e que alteracoes repetidas dentro de dez minutos geram no maximo um e-mail por interessado.
 22. Abrir o link de cancelamento no e-mail, confirmar a mensagem de sucesso e validar que novas edicoes do anuncio nao enviam outros avisos para esse favorito.
+23. Acessar `/sitemap.xml`, validar que o navegador exibe XML e confirmar a presenca de `/`, `/anuncios`, anuncios publicos ativos e seus anunciantes; rascunhos, anuncios nao publicados ou expirados e rotas privadas nao devem aparecer.
+24. Inspecionar o HTML de `/dashboard`, `/favoritos`, `/admin/anuncios`, `/admin/anuncios/create` e `/admin/anuncios/{id}/edit` e confirmar a meta tag `robots` com `noindex,nofollow`.

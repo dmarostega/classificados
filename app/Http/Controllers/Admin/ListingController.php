@@ -45,7 +45,7 @@ class ListingController extends Controller
             'listings' => $listings->through(
                 fn (Listing $listing): array => $this->serializeListing($listing, $images)
             ),
-            'seo' => SeoData::page('Meus anuncios')->toArray(),
+            'seo' => SeoData::privatePage('Meus anuncios')->toArray(),
         ]);
     }
 
@@ -56,7 +56,7 @@ class ListingController extends Controller
             'cities' => $locations->cities(),
             'states' => $locations->states(),
             'statuses' => $this->statuses(),
-            'seo' => SeoData::page('Novo anuncio')->toArray(),
+            'seo' => SeoData::privatePage('Novo anuncio')->toArray(),
         ]);
     }
 
@@ -92,7 +92,7 @@ class ListingController extends Controller
             'cities' => $locations->cities(),
             'states' => $locations->states(),
             'statuses' => $this->statuses(),
-            'seo' => SeoData::page('Editar anuncio')->toArray(),
+            'seo' => SeoData::privatePage('Editar anuncio')->toArray(),
         ]);
     }
 
