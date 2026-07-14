@@ -16,6 +16,7 @@ const revealedPhone = ref<ListingPhoneReveal | null>(null);
 const isRevealingPhone = ref(false);
 const phoneRevealError = ref<string | null>(null);
 const phoneCopied = ref(false);
+const phoneCopyError = ref<string | null>(null);
 
 const onPhoneInput = (event: Event): void => {
   form.phone = formatPhone((event.target as HTMLInputElement).value);
@@ -42,8 +43,15 @@ const copyPhone = async (): Promise<void> => {
     return;
   }
 
-  await navigator.clipboard.writeText(revealedPhone.value.phone);
-  phoneCopied.value = true;
+  phoneCopyError.value = null;
+
+  try {
+    await navigator.clipboard.writeText(revealedPhone.value.phone);
+    phoneCopied.value = true;
+  } catch {
+    phoneCopied.value = false;
+    phoneCopyError.value = 'Nao foi possivel copiar. Copie manualmente.';
+  }
 };
 </script>
 
@@ -150,6 +158,9 @@ const copyPhone = async (): Promise<void> => {
 
           <p v-if="phoneRevealError" class="text-sm text-red-700">
             {{ phoneRevealError }}
+          </p>
+          <p v-if="phoneCopyError" class="text-sm text-red-700">
+            {{ phoneCopyError }}
           </p>
         </div>
 
