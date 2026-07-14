@@ -23,6 +23,9 @@ it('normalizes public and private page metadata', function (): void {
 });
 
 it('lists only public indexable urls in the sitemap', function (): void {
+    expect(file_get_contents(resource_path('views/sitemap.blade.php')))
+        ->not->toContain('<?xml');
+
     $category = Category::query()->create([
         'name' => 'Eletronicos',
         'slug' => 'eletronicos',
