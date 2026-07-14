@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import ListingCard from '@/components/ListingCard.vue';
 import PaginationLinks from '@/components/PaginationLinks.vue';
+import SeoHead from '@/components/SeoHead.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
-import type { ListingCard as ListingCardData, Paginated } from '@/types';
+import type { ListingCard as ListingCardData, Paginated, SeoData } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { Heart } from '@lucide/vue';
 
-defineProps<{ listings: Paginated<ListingCardData> }>();
+defineProps<{ listings: Paginated<ListingCardData>; seo: SeoData }>();
 </script>
 
 <template>
+  <SeoHead :seo="seo" />
+
   <AppLayout>
     <section class="space-y-6">
       <header>

@@ -6,6 +6,7 @@ use App\Models\Listing;
 use App\Models\User;
 use App\Services\ListingFavoriteService;
 use App\Services\ListingImageService;
+use App\Support\Seo\SeoData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,6 +28,7 @@ class ListingFavoriteController extends Controller
             'listings' => $listings->through(
                 fn (Listing $listing): array => $this->listingCard($listing, $images)
             ),
+            'seo' => SeoData::privatePage('Meus favoritos')->toArray(),
         ]);
     }
 

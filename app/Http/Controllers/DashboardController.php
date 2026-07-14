@@ -34,7 +34,7 @@ class DashboardController extends Controller
                     'price' => $listing->formattedPrice(),
                     'edit_url' => route('admin.listings.edit', $listing),
                 ]),
-            'seo' => SeoData::page('Painel')->toArray(),
+            'seo' => SeoData::privatePage('Painel')->toArray(),
         ]);
     }
 }

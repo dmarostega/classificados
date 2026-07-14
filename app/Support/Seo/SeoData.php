@@ -37,6 +37,20 @@ final readonly class SeoData
         );
     }
 
+    public static function privatePage(string $title, ?string $description = null): self
+    {
+        $page = self::page($title, $description);
+
+        return new self(
+            title: $page->title,
+            description: $page->description,
+            image: $page->image,
+            canonical: $page->canonical,
+            robots: 'noindex,nofollow',
+            type: $page->type,
+        );
+    }
+
     /** @return array<string, string|null> */
     public function toArray(): array
     {
