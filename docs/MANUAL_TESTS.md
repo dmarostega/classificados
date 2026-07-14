@@ -15,3 +15,7 @@
 13. Acessar `/anunciantes/{id}` de um anunciante com anuncios publicos e confirmar o redirecionamento permanente para `/anunciantes/{slug}`; anunciante sem anuncios publicos deve retornar 404.
 14. Criar outro usuario e validar isolamento: ele nao deve editar, excluir ou listar anuncios do primeiro usuario.
 15. Confirmar que o detalhe publico usa `/anuncios/{slug}` e que a URL legada `/anuncios/{id}` de anuncio publicado redireciona permanentemente para a URL canonica; rascunhos e anuncios expirados devem retornar 404.
+16. Autenticado, abrir um anuncio publico, clicar em "Salvar nos favoritos" e confirmar o estado favoritado no detalhe, no catalogo e em `/favoritos`.
+17. Remover o anuncio dos favoritos pelo detalhe, atualizar a pagina e confirmar que ele nao aparece mais em `/favoritos`.
+18. Como visitante, confirmar que o detalhe oferece login para favoritar e que uma tentativa direta de `POST /favoritos/{slug}` redireciona para `/login` sem persistir dados.
+19. Alterar um anuncio favoritado para rascunho ou expirado e confirmar que ele deixa de aparecer em `/favoritos` e nao pode ser favoritado novamente enquanto nao estiver publico.

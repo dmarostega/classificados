@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ListingController;
 use App\Http\Controllers\AuthPageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GrowthEventController;
+use App\Http\Controllers\ListingFavoriteController;
 use App\Http\Controllers\ListingPhoneController;
 use App\Http\Controllers\MediaAssetController;
 use App\Http\Controllers\PublicAdvertiserController;
@@ -31,6 +32,9 @@ Route::middleware('guest')->group(function (): void {
 
 Route::middleware('auth')->group(function (): void {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/favoritos', [ListingFavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favoritos/{listing:slug}', [ListingFavoriteController::class, 'store'])->name('favorites.store');
+    Route::delete('/favoritos/{listing:slug}', [ListingFavoriteController::class, 'destroy'])->name('favorites.destroy');
     Route::resource('/admin/anuncios', ListingController::class)
         ->parameters(['anuncios' => 'listing'])
         ->names('admin.listings')

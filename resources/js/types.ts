@@ -78,6 +78,7 @@ export interface ListingCard {
   cover_url: string | null;
   edit_url?: string;
   public_url?: string | null;
+  is_favorited?: boolean;
 }
 
 export interface AdvertiserSummary {
