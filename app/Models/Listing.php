@@ -72,7 +72,7 @@ class Listing extends Model
 
     public function publicUrl(): string
     {
-        return route('listings.show', $this);
+        return route('listings.show', $this->slug);
     }
 
     public function isPubliclyVisible(): bool

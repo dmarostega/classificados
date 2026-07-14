@@ -62,8 +62,15 @@ class PublicListingController extends Controller
         ]);
     }
 
-    public function show(Listing $listing, ListingImageService $images): Response
+    public function show(string $listing, ListingImageService $images): Response|RedirectResponse
     {
+        if (ctype_digit($listing)) {
+            $listing = Listing::query()->findOrFail($listing);
+
+            return redirect()->route('listings.show', $listing->slug, 301);
+        }
+
+        $listing = Listing::query()->where('slug', $listing)->firstOrFail();
         abort_unless($listing->isPubliclyVisible(), 404);
 
         $listing->increment('views_count');
@@ -113,7 +120,7 @@ class PublicListingController extends Controller
             'city' => $listing->city,
             'state' => $listing->state,
             'published_at' => $listing->published_at?->toDateString(),
-            'url' => route('listings.show', $listing),
+            'url' => route('listings.show', $listing->slug),
             'cover_url' => $images->coverUrl($listing),
         ];
     }

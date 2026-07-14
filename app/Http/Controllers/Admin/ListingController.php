@@ -132,7 +132,7 @@ class ListingController extends Controller
             'published_at' => $listing->published_at?->toDateString(),
             'cover_url' => $images->coverUrl($listing),
             'edit_url' => route('admin.listings.edit', $listing),
-            'public_url' => $listing->status->isPublic() ? route('listings.show', $listing) : null,
+            'public_url' => $listing->status->isPublic() ? route('listings.show', $listing->slug) : null,
         ];
     }
 

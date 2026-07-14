@@ -131,7 +131,7 @@ it('exposes the advertiser page link in public listing detail payload', function
         'published_at' => now(),
     ]);
 
-    $this->get(route('listings.show', $listing))->assertOk()
+    $this->get(route('listings.show', $listing->slug))->assertOk()
         ->assertSee('Vendedor Local')
         ->assertSee('anunciantes\\/'.$advertiser->slug, false)
         ->assertSee('(47) 9****-1234')

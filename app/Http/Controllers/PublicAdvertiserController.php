@@ -59,7 +59,7 @@ class PublicAdvertiserController extends Controller
             'city' => $listing->city,
             'state' => $listing->state,
             'published_at' => $listing->published_at?->toDateString(),
-            'url' => route('listings.show', $listing),
+            'url' => route('listings.show', $listing->slug),
             'cover_url' => $images->coverUrl($listing),
         ];
     }

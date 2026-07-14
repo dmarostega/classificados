@@ -12,3 +12,4 @@
 10. No detalhe publico do anuncio, confirmar que o telefone aparece mascarado, sem link telefonico, e clicar em "Ver mais anuncios deste anunciante"; validar que `/anunciantes/{slug}` lista somente os anuncios publicados, ativos e nao expirados daquele usuario, sem exibir e-mail ou dados privados da conta.
 11. Acessar `/anunciantes/{id}` e confirmar o redirecionamento permanente para `/anunciantes/{slug}`.
 12. Criar outro usuario e validar isolamento: ele nao deve editar, excluir ou listar anuncios do primeiro usuario.
+13. Confirmar que o detalhe publico usa `/anuncios/{slug}` e que a URL legada `/anuncios/{id}` redireciona permanentemente para a URL canonica.

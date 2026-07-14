@@ -8,6 +8,7 @@ use App\Models\ListingImage;
 use App\Models\MediaAsset;
 use App\Models\User;
 use App\Services\ListingImageService;
+use App\Services\ListingService;
 use Database\Seeders\LocationSeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
@@ -139,6 +140,50 @@ it('emails the advertiser when a public listing receives contact', function (): 
     );
 });
 
+it('uses globally unique slugs for listings from different advertisers', function (): void {
+    $firstUser = User::factory()->create();
+    $secondUser = User::factory()->create();
+    $category = categoryForListings();
+    $data = [
+        'category_id' => $category->id,
+        'title' => 'Mesa de madeira',
+        'description' => 'Mesa em madeira macica para sala de jantar.',
+        'price' => '350.00',
+        'city' => 'Maringa',
+        'state' => 'PR',
+        'contact_name' => 'Anunciante',
+        'status' => ListingStatus::Draft,
+    ];
+
+    $firstListing = app(ListingService::class)->create($firstUser, $data);
+    $secondListing = app(ListingService::class)->create($secondUser, $data);
+
+    expect($firstListing->slug)->toBe('mesa-de-madeira')
+        ->and($secondListing->slug)->toBe('mesa-de-madeira-2');
+});
+
+it('redirects legacy public listing ids to the canonical slug url', function (): void {
+    $user = User::factory()->create();
+    $category = categoryForListings();
+    $listing = Listing::query()->create([
+        'user_id' => $user->id,
+        'category_id' => $category->id,
+        'title' => 'Cadeira de escritorio',
+        'slug' => 'cadeira-de-escritorio',
+        'description' => 'Cadeira ergonomica em boas condicoes.',
+        'price_cents' => 40000,
+        'city' => 'Maringa',
+        'state' => 'PR',
+        'contact_name' => 'Anunciante',
+        'status' => ListingStatus::Published,
+        'published_at' => now(),
+    ]);
+
+    $this->get("/anuncios/{$listing->id}")
+        ->assertRedirect("/anuncios/{$listing->slug}")
+        ->assertStatus(301);
+});
+
 it('renders listing social meta tags in the initial html with the cover image', function (): void {
     Storage::fake('public');
 
@@ -174,11 +219,11 @@ it('renders listing social meta tags in the initial html with the cover image', 
         'is_cover' => true,
     ]);
 
-    $this->get("/anuncios/{$listing->id}")->assertOk()
+    $this->get("/anuncios/{$listing->slug}")->assertOk()
         ->assertSee('<meta property="og:title" content="Bicicleta aro 29 | Classificados">', false)
         ->assertSee('<meta property="og:description"', false)
         ->assertSee('<meta property="og:image" content="http://localhost/storage/media/share.webp">', false)
-        ->assertSee('<meta property="og:url" content="http://localhost/anuncios/'.$listing->id.'">', false)
+        ->assertSee('<meta property="og:url" content="http://localhost/anuncios/'.$listing->slug.'">', false)
         ->assertSee('<meta name="twitter:title" content="Bicicleta aro 29 | Classificados">', false)
         ->assertSee('<meta name="twitter:description"', false)
         ->assertSee('<meta name="twitter:image" content="http://localhost/storage/media/share.webp">', false);
@@ -203,7 +248,7 @@ it('uses the configured default social image when listing has no image', functio
         'published_at' => now(),
     ]);
 
-    $this->get("/anuncios/{$listing->id}")->assertOk()
+    $this->get("/anuncios/{$listing->slug}")->assertOk()
         ->assertSee('<meta property="og:image" content="http://localhost/images/default-share.png">', false)
         ->assertSee('<meta name="twitter:image" content="http://localhost/images/default-share.png">', false);
 });
@@ -258,7 +303,7 @@ it('ignores missing storage files when rendering public listing images', functio
         'is_cover' => false,
     ]);
 
-    $this->get("/anuncios/{$listing->id}")->assertOk()
+    $this->get("/anuncios/{$listing->slug}")->assertOk()
         ->assertDontSee('/storage/media/2026/07/missing.webp')
         ->assertSee('/storage/media/2026/07/current.webp')
         ->assertSee('<meta property="og:image" content="http://localhost/storage/media/2026/07/current.webp">', false);

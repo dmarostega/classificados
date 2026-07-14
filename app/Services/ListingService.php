@@ -56,7 +56,7 @@ class ListingService
             'user_id' => $user->id,
             'category_id' => $data['category_id'],
             'title' => $data['title'],
-            'slug' => $this->uniqueSlug($user, $data['title'], $listing),
+            'slug' => $this->uniqueSlug($data['title'], $listing),
             'description' => $data['description'],
             'price_cents' => (int) round(((float) $data['price']) * 100),
             'city' => $data['city'],
@@ -70,14 +70,18 @@ class ListingService
         ];
     }
 
-    private function uniqueSlug(User $user, string $title, ?Listing $listing = null): string
+    private function uniqueSlug(string $title, ?Listing $listing = null): string
     {
         $base = Str::slug($title) ?: Str::lower((string) Str::ulid());
+
+        if (ctype_digit($base)) {
+            $base = "anuncio-{$base}";
+        }
+
         $slug = $base;
         $suffix = 2;
 
-        while (Listing::where('user_id', $user->id)
-            ->where('slug', $slug)
+        while (Listing::where('slug', $slug)
             ->when($listing, fn ($query) => $query->whereKeyNot($listing->id))
             ->exists()) {
             $slug = $base.'-'.$suffix++;
