@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ListingController;
 use App\Http\Controllers\AuthPageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GrowthEventController;
+use App\Http\Controllers\ListingPhoneController;
 use App\Http\Controllers\MediaAssetController;
 use App\Http\Controllers\PublicAdvertiserController;
 use App\Http\Controllers\PublicListingController;
@@ -12,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicListingController::class, 'index'])->name('home');
 Route::get('/anuncios', [PublicListingController::class, 'index'])->name('listings.index');
+Route::get('/anuncios/{listing:slug}/telefone', ListingPhoneController::class)
+    ->middleware('throttle:10,1')
+    ->name('listings.phone.show');
 Route::get('/anuncios/{listing}', [PublicListingController::class, 'show'])->name('listings.show');
 Route::get('/anunciantes/{advertiser}', PublicAdvertiserController::class)->name('advertisers.show');
 Route::post('/anuncios/{listing:slug}/contato', [PublicListingController::class, 'contact'])->middleware('throttle:10,1')->name('listings.contact');

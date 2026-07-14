@@ -2,18 +2,56 @@
 import SeoHead from '@/components/SeoHead.vue';
 import { formatPhone } from '@/composables/useInputMasks';
 import AppLayout from '@/layouts/AppLayout.vue';
-import type { ListingDetail, SeoData } from '@/types';
+import type { ListingDetail, ListingPhoneReveal, SeoData } from '@/types';
 import { Link, useForm } from '@inertiajs/vue3';
-import { Mail, Phone } from '@lucide/vue';
+import { Check, Copy, Mail, MessageCircle, Phone } from '@lucide/vue';
+import axios from 'axios';
 import { computed, ref } from 'vue';
 
 const props = defineProps<{ seo: SeoData; listing: ListingDetail }>();
 const selectedImage = ref(props.listing.images[0]?.url || props.listing.cover_url);
 const form = useForm({ name: '', email: '', phone: '', message: '' });
 const hasImages = computed(() => props.listing.images.length > 0);
+const revealedPhone = ref<ListingPhoneReveal | null>(null);
+const isRevealingPhone = ref(false);
+const phoneRevealError = ref<string | null>(null);
+const phoneCopied = ref(false);
+const phoneCopyError = ref<string | null>(null);
 
 const onPhoneInput = (event: Event): void => {
   form.phone = formatPhone((event.target as HTMLInputElement).value);
+};
+
+const revealPhone = async (): Promise<void> => {
+  isRevealingPhone.value = true;
+  phoneRevealError.value = null;
+
+  try {
+    const response = await axios.get<ListingPhoneReveal>(
+      `/anuncios/${props.listing.slug}/telefone`,
+    );
+    revealedPhone.value = response.data;
+  } catch {
+    phoneRevealError.value = 'Nao foi possivel revelar o telefone agora.';
+  } finally {
+    isRevealingPhone.value = false;
+  }
+};
+
+const copyPhone = async (): Promise<void> => {
+  if (!revealedPhone.value) {
+    return;
+  }
+
+  phoneCopyError.value = null;
+
+  try {
+    await navigator.clipboard.writeText(revealedPhone.value.phone);
+    phoneCopied.value = true;
+  } catch {
+    phoneCopied.value = false;
+    phoneCopyError.value = 'Nao foi possivel copiar. Copie manualmente.';
+  }
 };
 </script>
 
@@ -74,13 +112,57 @@ const onPhoneInput = (event: Event): void => {
         >
           Ver mais anuncios deste anunciante
         </Link>
-        <p
-          v-if="listing.contact_phone_masked"
-          class="mt-4 inline-flex items-center gap-2 text-sm font-medium"
-        >
-          <Phone class="h-4 w-4" />
-          {{ listing.contact_phone_masked }}
-        </p>
+        <div v-if="listing.contact_phone_masked" class="mt-4 space-y-3">
+          <p class="inline-flex items-center gap-2 text-sm font-medium">
+            <Phone class="h-4 w-4" />
+            {{ revealedPhone?.phone || listing.contact_phone_masked }}
+          </p>
+
+          <button
+            v-if="!revealedPhone"
+            class="block rounded-md border px-3 py-2 text-sm font-medium hover:bg-slate-50 disabled:opacity-60"
+            type="button"
+            :disabled="isRevealingPhone"
+            @click="revealPhone"
+          >
+            {{ isRevealingPhone ? 'Revelando...' : 'Ver telefone' }}
+          </button>
+
+          <div v-else class="flex flex-wrap gap-2">
+            <button
+              class="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium hover:bg-slate-50"
+              type="button"
+              @click="copyPhone"
+            >
+              <Check v-if="phoneCopied" class="h-4 w-4" />
+              <Copy v-else class="h-4 w-4" />
+              {{ phoneCopied ? 'Copiado' : 'Copiar' }}
+            </button>
+            <a
+              class="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium hover:bg-slate-50"
+              :href="revealedPhone.phone_href"
+            >
+              <Phone class="h-4 w-4" />
+              Ligar
+            </a>
+            <a
+              class="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium hover:bg-slate-50"
+              :href="revealedPhone.whatsapp_url"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <MessageCircle class="h-4 w-4" />
+              WhatsApp
+            </a>
+          </div>
+
+          <p v-if="phoneRevealError" class="text-sm text-red-700">
+            {{ phoneRevealError }}
+          </p>
+          <p v-if="phoneCopyError" class="text-sm text-red-700">
+            {{ phoneCopyError }}
+          </p>
+        </div>
 
         <form
           class="mt-6 space-y-4"
