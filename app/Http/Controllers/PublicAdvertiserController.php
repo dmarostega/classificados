@@ -17,6 +17,8 @@ class PublicAdvertiserController extends Controller
         if (ctype_digit($advertiser)) {
             $user = User::query()->findOrFail($advertiser);
 
+            abort_unless($this->hasPublicListings($user), 404);
+
             return redirect()->route('advertisers.show', $user->slug, 301);
         }
 
@@ -62,5 +64,10 @@ class PublicAdvertiserController extends Controller
             'url' => route('listings.show', $listing->slug),
             'cover_url' => $images->coverUrl($listing),
         ];
+    }
+
+    private function hasPublicListings(User $user): bool
+    {
+        return Listing::query()->public()->whereBelongsTo($user)->exists();
     }
 }

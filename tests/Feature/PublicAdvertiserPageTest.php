@@ -99,11 +99,27 @@ it('returns not found when advertiser has no public listings', function (): void
     $advertiser = User::factory()->create();
 
     $this->get(route('advertisers.show', $advertiser->slug))->assertNotFound();
+    $this->get(route('advertisers.show', $advertiser->id))->assertNotFound();
 });
 
 it('generates unique advertiser slugs and redirects the legacy url', function (): void {
     $advertiser = User::factory()->create(['name' => 'Loja Central']);
     $advertiserWithSameName = User::factory()->create(['name' => 'Loja Central']);
+    $category = categoryForAdvertiserPage();
+
+    Listing::query()->create([
+        'user_id' => $advertiser->id,
+        'category_id' => $category->id,
+        'title' => 'Estante publicada',
+        'slug' => 'estante-publicada',
+        'description' => 'Estante publicada pelo anunciante.',
+        'price_cents' => 25000,
+        'city' => 'Jaragua do Sul',
+        'state' => 'SC',
+        'contact_name' => 'Loja Central',
+        'status' => ListingStatus::Published,
+        'published_at' => now(),
+    ]);
 
     expect($advertiser->slug)->toBe('loja-central')
         ->and($advertiserWithSameName->slug)->toBe('loja-central-2');

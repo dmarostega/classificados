@@ -184,6 +184,40 @@ it('redirects legacy public listing ids to the canonical slug url', function ():
         ->assertStatus(301);
 });
 
+it('does not redirect legacy ids for listings that are not publicly visible', function (): void {
+    $user = User::factory()->create();
+    $category = categoryForListings();
+    $draftListing = Listing::query()->create([
+        'user_id' => $user->id,
+        'category_id' => $category->id,
+        'title' => 'Mesa em rascunho',
+        'slug' => 'mesa-em-rascunho',
+        'description' => 'Mesa ainda nao publicada.',
+        'price_cents' => 30000,
+        'city' => 'Maringa',
+        'state' => 'PR',
+        'contact_name' => 'Anunciante',
+        'status' => ListingStatus::Draft,
+    ]);
+    $expiredListing = Listing::query()->create([
+        'user_id' => $user->id,
+        'category_id' => $category->id,
+        'title' => 'Cadeira expirada',
+        'slug' => 'cadeira-expirada',
+        'description' => 'Cadeira com anuncio expirado.',
+        'price_cents' => 20000,
+        'city' => 'Maringa',
+        'state' => 'PR',
+        'contact_name' => 'Anunciante',
+        'status' => ListingStatus::Published,
+        'published_at' => now()->subDays(2),
+        'expires_at' => now()->subDay(),
+    ]);
+
+    $this->get("/anuncios/{$draftListing->id}")->assertNotFound();
+    $this->get("/anuncios/{$expiredListing->id}")->assertNotFound();
+});
+
 it('renders listing social meta tags in the initial html with the cover image', function (): void {
     Storage::fake('public');
 

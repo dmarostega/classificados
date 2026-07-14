@@ -67,6 +67,8 @@ class PublicListingController extends Controller
         if (ctype_digit($listing)) {
             $listing = Listing::query()->findOrFail($listing);
 
+            abort_unless($listing->isPubliclyVisible(), 404);
+
             return redirect()->route('listings.show', $listing->slug, 301);
         }
 
