@@ -85,6 +85,12 @@ export interface AdvertiserSummary {
   url: string;
 }
 
+export interface ListingPhoneReveal {
+  phone: string;
+  phone_href: string;
+  whatsapp_url: string;
+}
+
 export interface ListingDetail extends ListingCard {
   description: string;
   category_id?: number;
