@@ -19,3 +19,6 @@
 17. Remover o anuncio dos favoritos pelo detalhe, atualizar a pagina e confirmar que ele nao aparece mais em `/favoritos`.
 18. Como visitante, confirmar que o detalhe oferece login para favoritar e que uma tentativa direta de `POST /favoritos/{slug}` redireciona para `/login` sem persistir dados.
 19. Alterar um anuncio favoritado para rascunho ou expirado e confirmar que ele deixa de aparecer em `/favoritos` e nao pode ser favoritado novamente enquanto nao estiver publico.
+20. Com um worker de fila ativo, editar titulo, categoria, descricao, preco, cidade/UF ou imagens de um anuncio publico favoritado e confirmar que o interessado recebe um unico e-mail; alterar apenas contato, validade ou status nao deve enviar aviso.
+21. Confirmar que o anunciante nao recebe aviso do proprio anuncio e que alteracoes repetidas dentro de dez minutos geram no maximo um e-mail por interessado.
+22. Abrir o link de cancelamento no e-mail, confirmar a mensagem de sucesso e validar que novas edicoes do anuncio nao enviam outros avisos para esse favorito.
