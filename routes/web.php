@@ -14,7 +14,7 @@ Route::get('/', [PublicListingController::class, 'index'])->name('home');
 Route::get('/anuncios', [PublicListingController::class, 'index'])->name('listings.index');
 Route::get('/anuncios/{listing}', [PublicListingController::class, 'show'])->name('listings.show');
 Route::get('/anunciantes/{advertiser}', PublicAdvertiserController::class)->name('advertisers.show');
-Route::post('/anuncios/{listing}/contato', [PublicListingController::class, 'contact'])->middleware('throttle:10,1')->name('listings.contact');
+Route::post('/anuncios/{listing:slug}/contato', [PublicListingController::class, 'contact'])->middleware('throttle:10,1')->name('listings.contact');
 Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::post('/growth/events', [GrowthEventController::class, 'store'])->middleware('throttle:120,1')->name('growth.events.store');
 

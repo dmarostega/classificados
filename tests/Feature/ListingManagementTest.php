@@ -127,7 +127,7 @@ it('emails the advertiser when a public listing receives contact', function (): 
         'published_at' => now(),
     ]);
 
-    $this->post("/anuncios/{$listing->id}/contato", [
+    $this->post("/anuncios/{$listing->slug}/contato", [
         'name' => 'Comprador',
         'email' => 'buyer@example.com',
         'phone' => '(43) 98888-0000',
@@ -138,6 +138,30 @@ it('emails the advertiser when a public listing receives contact', function (): 
         ListingContactMail::class,
         fn (ListingContactMail $mail): bool => $mail->hasTo('seller@example.com'),
     );
+});
+
+it('does not accept legacy listing ids for public contact', function (): void {
+    $user = User::factory()->create();
+    $category = categoryForListings();
+    $listing = Listing::query()->create([
+        'user_id' => $user->id,
+        'category_id' => $category->id,
+        'title' => 'Mesa para contato',
+        'slug' => 'mesa-para-contato',
+        'description' => 'Mesa publicada para validar a rota de contato.',
+        'price_cents' => 45000,
+        'city' => 'Maringa',
+        'state' => 'PR',
+        'contact_name' => 'Anunciante',
+        'status' => ListingStatus::Published,
+        'published_at' => now(),
+    ]);
+
+    $this->post("/anuncios/{$listing->id}/contato", [
+        'name' => 'Comprador',
+        'email' => 'buyer@example.com',
+        'message' => 'Tenho interesse no produto anunciado.',
+    ])->assertNotFound();
 });
 
 it('uses globally unique slugs for listings from different advertisers', function (): void {

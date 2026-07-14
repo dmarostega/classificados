@@ -8,7 +8,7 @@
 6. Enviar pelo menos duas imagens e confirmar que os arquivos foram salvos como WebP no disco publico.
 7. Remover todas as imagens de um anuncio, adicionar uma nova, publicar e confirmar que lista, detalhe e tags sociais usam somente a imagem existente em `storage/app/public`.
 8. Publicar o anuncio e validar busca, filtro por categoria/cidade/UF e pagina de detalhe em `/anuncios`.
-9. Enviar contato no detalhe e conferir entrega pelo mailer configurado, inicialmente `log`.
+9. Enviar contato no detalhe pela URL publica com slug e conferir entrega pelo mailer configurado, inicialmente `log`; a rota legada com ID deve retornar 404.
 10. No detalhe publico do anuncio, confirmar que o telefone aparece mascarado, sem link telefonico, e clicar em "Ver mais anuncios deste anunciante"; validar que `/anunciantes/{slug}` lista somente os anuncios publicados, ativos e nao expirados daquele usuario, sem exibir e-mail ou dados privados da conta.
 11. Acessar `/anunciantes/{id}` de um anunciante com anuncios publicos e confirmar o redirecionamento permanente para `/anunciantes/{slug}`; anunciante sem anuncios publicos deve retornar 404.
 12. Criar outro usuario e validar isolamento: ele nao deve editar, excluir ou listar anuncios do primeiro usuario.

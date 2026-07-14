@@ -82,7 +82,7 @@ const onPhoneInput = (event: Event): void => {
           {{ listing.contact_phone_masked }}
         </p>
 
-        <form class="mt-6 space-y-4" @submit.prevent="form.post(`/anuncios/${listing.id}/contato`)">
+        <form class="mt-6 space-y-4" @submit.prevent="form.post(`/anuncios/${listing.slug}/contato`)">
           <div>
             <label class="mb-1 block text-sm font-medium" for="name">Nome</label>
             <input
