@@ -78,6 +78,7 @@ export interface ListingCard {
   cover_url: string | null;
   edit_url?: string;
   public_url?: string | null;
+  is_favorited?: boolean;
 }
 
 export interface AdvertiserSummary {
@@ -85,12 +86,19 @@ export interface AdvertiserSummary {
   url: string;
 }
 
+export interface ListingPhoneReveal {
+  phone: string;
+  phone_href: string;
+  whatsapp_url: string;
+}
+
 export interface ListingDetail extends ListingCard {
   description: string;
   category_id?: number;
   contact_name: string;
   contact_email?: string | null;
-  contact_phone: string | null;
+  contact_phone?: string | null;
+  contact_phone_masked?: string | null;
   advertiser?: AdvertiserSummary;
   expires_at?: string | null;
   images: ListingImage[];

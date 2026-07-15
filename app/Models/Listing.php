@@ -55,6 +55,11 @@ class Listing extends Model
         return $this->hasMany(ListingImage::class)->orderBy('sort_order');
     }
 
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(ListingFavorite::class);
+    }
+
     public function coverImage(): HasMany
     {
         return $this->images()->where('is_cover', true);
@@ -72,7 +77,7 @@ class Listing extends Model
 
     public function publicUrl(): string
     {
-        return route('listings.show', $this);
+        return route('listings.show', $this->slug);
     }
 
     public function isPubliclyVisible(): bool
@@ -85,5 +90,24 @@ class Listing extends Model
     public function formattedPrice(): string
     {
         return 'R$ '.number_format($this->price_cents / 100, 2, ',', '.');
+    }
+
+    public function maskedContactPhone(): ?string
+    {
+        $digits = preg_replace('/\D/', '', (string) $this->contact_phone);
+
+        if ($digits === '') {
+            return null;
+        }
+
+        if (strlen($digits) === 11) {
+            return sprintf('(%s) %s****-%s', substr($digits, 0, 2), $digits[2], substr($digits, -4));
+        }
+
+        if (strlen($digits) === 10) {
+            return sprintf('(%s) ****-%s', substr($digits, 0, 2), substr($digits, -4));
+        }
+
+        return str_repeat('*', max(strlen($digits) - 4, 0)).substr($digits, -4);
     }
 }

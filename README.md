@@ -27,6 +27,16 @@ npm install
 npm run build
 ```
 
+## Atualização em Produção
+```bash
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force
+php artisan storage:link
+npm install
+npm run build
+php artisan optimize:clear
+```
+
 ## Fluxos principais
 
 - Visitantes acessam `/anuncios`, filtram anuncios e enviam contato ao anunciante.

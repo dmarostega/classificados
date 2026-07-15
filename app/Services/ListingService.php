@@ -12,7 +12,19 @@ use Illuminate\Support\Str;
 
 class ListingService
 {
-    public function __construct(private readonly ListingImageService $images) {}
+    private const NOTIFIABLE_FIELDS = [
+        'category_id',
+        'title',
+        'description',
+        'price_cents',
+        'city',
+        'state',
+    ];
+
+    public function __construct(
+        private readonly ListingImageService $images,
+        private readonly FavoriteListingNotificationService $notifications,
+    ) {}
 
     public function create(User $user, array $data): Listing
     {
@@ -26,17 +38,35 @@ class ListingService
 
     public function update(Listing $listing, array $data): Listing
     {
-        return DB::transaction(function () use ($listing, $data): Listing {
+        $wasPubliclyVisible = $listing->isPubliclyVisible();
+        $originalImageIds = $listing->images()->pluck('id')->all();
+        $hasRelevantChanges = false;
+
+        $updatedListing = DB::transaction(function () use (
+            $listing,
+            $data,
+            $originalImageIds,
+            &$hasRelevantChanges,
+        ): Listing {
             $listing->update($this->payload($listing->user, $data, $listing));
+            $hasRelevantChanges = $listing->wasChanged(self::NOTIFIABLE_FIELDS);
 
             if (! empty($data['remove_image_ids'])) {
                 $this->images->deleteImages($listing, Arr::wrap($data['remove_image_ids']));
             }
 
             $this->images->attachUploadedImages($listing, $listing->user, Arr::wrap($data['images'] ?? []));
+            $currentImageIds = $listing->images()->pluck('id')->all();
+            $hasRelevantChanges = $hasRelevantChanges || $originalImageIds !== $currentImageIds;
 
             return $listing->fresh(['category', 'images.mediaAsset']);
         });
+
+        if ($wasPubliclyVisible && $updatedListing->isPubliclyVisible() && $hasRelevantChanges) {
+            $this->notifications->dispatchFor($updatedListing);
+        }
+
+        return $updatedListing;
     }
 
     private function payload(User $user, array $data, ?Listing $listing = null): array
@@ -56,7 +86,7 @@ class ListingService
             'user_id' => $user->id,
             'category_id' => $data['category_id'],
             'title' => $data['title'],
-            'slug' => $this->uniqueSlug($user, $data['title'], $listing),
+            'slug' => $this->uniqueSlug($data['title'], $listing),
             'description' => $data['description'],
             'price_cents' => (int) round(((float) $data['price']) * 100),
             'city' => $data['city'],
@@ -70,14 +100,18 @@ class ListingService
         ];
     }
 
-    private function uniqueSlug(User $user, string $title, ?Listing $listing = null): string
+    private function uniqueSlug(string $title, ?Listing $listing = null): string
     {
         $base = Str::slug($title) ?: Str::lower((string) Str::ulid());
+
+        if (ctype_digit($base)) {
+            $base = "anuncio-{$base}";
+        }
+
         $slug = $base;
         $suffix = 2;
 
-        while (Listing::where('user_id', $user->id)
-            ->where('slug', $slug)
+        while (Listing::where('slug', $slug)
             ->when($listing, fn ($query) => $query->whereKeyNot($listing->id))
             ->exists()) {
             $slug = $base.'-'.$suffix++;
