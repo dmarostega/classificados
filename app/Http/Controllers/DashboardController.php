@@ -15,6 +15,11 @@ class DashboardController extends Controller
         $query = Listing::query()->whereBelongsTo($request->user());
 
         return Inertia::render('Dashboard', [
+            'advertiserProfile' => [
+                'og_image_url' => $request->user()->ogImage?->existsOnDisk()
+                    ? $request->user()->ogImage->url
+                    : null,
+            ],
             'metrics' => [
                 'total' => (clone $query)->count(),
                 'published' => (clone $query)->where('status', 'published')->count(),

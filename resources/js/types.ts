@@ -79,6 +79,7 @@ export interface ListingCard {
   edit_url?: string;
   public_url?: string | null;
   is_favorited?: boolean;
+  is_featured?: boolean;
 }
 
 export interface AdvertiserSummary {

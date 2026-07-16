@@ -5,7 +5,7 @@ import SeoHead from '@/components/SeoHead.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { ListingCard, Paginated, SelectOption, SeoData } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
-import { Pencil, Plus, Search, Trash2 } from '@lucide/vue';
+import { Pencil, Plus, Search, Star, Trash2 } from '@lucide/vue';
 import { reactive } from 'vue';
 
 const props = defineProps<{
@@ -22,6 +22,9 @@ const destroyListing = (id: number): void => {
   if (window.confirm('Remover este anuncio?')) {
     router.delete(`/admin/anuncios/${id}`);
   }
+};
+const toggleFeatured = (listing: ListingCard): void => {
+  router[listing.is_featured ? 'delete' : 'post'](`/admin/anuncios/${listing.id}/destaque`);
 };
 </script>
 
@@ -90,8 +93,23 @@ const destroyListing = (id: number): void => {
                 {{ listing.category }} - {{ listing.city }} / {{ listing.state }}
               </p>
               <p class="mt-2 font-bold">{{ listing.price }}</p>
+              <p v-if="listing.is_featured" class="mt-2 text-sm font-semibold text-amber-700">
+                Anuncio em destaque
+              </p>
             </div>
             <div class="flex items-center gap-2">
+              <button
+                v-if="listing.public_url"
+                class="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
+                type="button"
+                @click="toggleFeatured(listing)"
+              >
+                <Star
+                  class="h-4 w-4"
+                  :class="listing.is_featured ? 'fill-current text-amber-500' : ''"
+                />
+                {{ listing.is_featured ? 'Remover destaque' : 'Definir destaque' }}
+              </button>
               <Link
                 class="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
                 :href="listing.edit_url || '#'"

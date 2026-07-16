@@ -26,3 +26,5 @@
 24. Inspecionar o HTML de `/dashboard`, `/favoritos`, `/admin/anuncios`, `/admin/anuncios/create` e `/admin/anuncios/{id}/edit` e confirmar a meta tag `robots` com `noindex,nofollow`.
 25. No catalogo, favoritos e pagina de anunciante, validar cards com imagens verticais, horizontais, quadradas e sem imagem: o item deve aparecer inteiro, sem distorcao, mantendo a grade alinhada e fundo neutro nas sobras.
 26. No detalhe de um anuncio com uma ou mais imagens, clicar na imagem principal para abrir a visualizacao ampliada; validar imagem sem corte, fechamento pelo botao, clique fora e tecla `Esc`, retorno do foco ao acionador e navegacao pelas setas ou teclado quando houver mais de uma imagem.
+27. No painel, definir um anuncio publicado como destaque e confirmar o selo; no perfil publico ele deve aparecer primeiro. Tentar destacar rascunho ou anuncio de outro usuario deve falhar.
+28. No painel, enviar, substituir e remover a imagem de compartilhamento; inspecionar o HTML de `/anunciantes/{slug}` e confirmar a prioridade OG personalizada, anuncio destacado, primeiro anuncio publico e imagem padrao.
