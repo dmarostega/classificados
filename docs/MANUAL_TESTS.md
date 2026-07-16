@@ -24,3 +24,5 @@
 22. Abrir o link de cancelamento no e-mail, confirmar a mensagem de sucesso e validar que novas edicoes do anuncio nao enviam outros avisos para esse favorito.
 23. Acessar `/sitemap.xml`, validar que o navegador exibe XML e confirmar a presenca de `/`, `/anuncios`, anuncios publicos ativos e seus anunciantes; rascunhos, anuncios nao publicados ou expirados e rotas privadas nao devem aparecer.
 24. Inspecionar o HTML de `/dashboard`, `/favoritos`, `/admin/anuncios`, `/admin/anuncios/create` e `/admin/anuncios/{id}/edit` e confirmar a meta tag `robots` com `noindex,nofollow`.
+25. No catalogo, favoritos e pagina de anunciante, validar cards com imagens verticais, horizontais, quadradas e sem imagem: o item deve aparecer inteiro, sem distorcao, mantendo a grade alinhada e fundo neutro nas sobras.
+26. No detalhe de um anuncio com uma ou mais imagens, clicar na imagem principal para abrir a visualizacao ampliada; validar imagem sem corte, fechamento pelo botao, clique fora e tecla `Esc`, retorno do foco ao acionador e navegacao pelas setas ou teclado quando houver mais de uma imagem.

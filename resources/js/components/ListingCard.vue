@@ -18,12 +18,12 @@ defineProps<{ listing: ListingCardData }>();
       <Heart class="h-3.5 w-3.5 fill-current" />
       Favorito
     </span>
-    <div class="aspect-[4/3] bg-slate-100">
+    <div class="aspect-[4/3] bg-slate-100 p-2">
       <img
         v-if="listing.cover_url"
         :src="listing.cover_url"
         :alt="listing.title"
-        class="h-full w-full object-cover"
+        class="h-full w-full object-contain"
       />
       <div v-else class="flex h-full items-center justify-center text-sm text-slate-400">
         Sem imagem
