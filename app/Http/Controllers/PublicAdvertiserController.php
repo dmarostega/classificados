@@ -22,11 +22,13 @@ class PublicAdvertiserController extends Controller
             return redirect()->route('advertisers.show', $user->slug, 301);
         }
 
-        $user = User::query()->where('slug', $advertiser)->firstOrFail();
+        $user = User::query()->with(['featuredListing.images.mediaAsset', 'ogImage'])->where('slug', $advertiser)->firstOrFail();
+        $featuredListing = $user->featuredListing?->isPubliclyVisible() ? $user->featuredListing : null;
         $listings = Listing::query()
             ->public()
             ->whereBelongsTo($user)
             ->with(['category', 'images.mediaAsset'])
+            ->when($featuredListing, fn ($query) => $query->orderByRaw('id = ? desc', [$featuredListing->id]))
             ->latest('published_at')
             ->paginate(12)
             ->withQueryString();
@@ -34,6 +36,7 @@ class PublicAdvertiserController extends Controller
         abort_if($listings->total() === 0, 404);
 
         $firstListing = $listings->getCollection()->first();
+        $ogImage = $user->ogImage?->existsOnDisk() ? $user->ogImage->url : null;
 
         return Inertia::render('Public/Advertisers/Show', [
             'advertiser' => [
@@ -45,7 +48,7 @@ class PublicAdvertiserController extends Controller
             'seo' => SeoData::page(
                 "Anuncios de {$user->name}",
                 "Veja anuncios publicados por {$user->name} no Classificados.",
-                $firstListing ? $images->coverUrl($firstListing) : null,
+                $ogImage ?? ($featuredListing ? $images->coverUrl($featuredListing) : null) ?? ($firstListing ? $images->coverUrl($firstListing) : null),
             )->toArray(),
         ]);
     }
