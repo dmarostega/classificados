@@ -1,16 +1,19 @@
 <script setup lang="ts">
+import ListingImageLightbox from '@/components/ListingImageLightbox.vue';
 import SeoHead from '@/components/SeoHead.vue';
 import { formatPhone } from '@/composables/useInputMasks';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { ListingDetail, ListingPhoneReveal, PageProps, SeoData } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
-import { Check, Copy, Heart, Mail, MessageCircle, Phone } from '@lucide/vue';
+import { Check, Copy, Heart, Mail, Maximize2, MessageCircle, Phone } from '@lucide/vue';
 import axios from 'axios';
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 
 const props = defineProps<{ seo: SeoData; listing: ListingDetail }>();
 const page = usePage<PageProps>();
 const selectedImage = ref(props.listing.images[0]?.url || props.listing.cover_url);
+const isLightboxOpen = ref(false);
+const imageTrigger = ref<HTMLButtonElement | null>(null);
 const form = useForm({ name: '', email: '', phone: '', message: '' });
 const favoriteForm = useForm({});
 const hasImages = computed(() => props.listing.images.length > 0);
@@ -20,6 +23,27 @@ const isRevealingPhone = ref(false);
 const phoneRevealError = ref<string | null>(null);
 const phoneCopied = ref(false);
 const phoneCopyError = ref<string | null>(null);
+
+const selectImage = (imageUrl: string): void => {
+  selectedImage.value = imageUrl;
+};
+
+const openLightbox = (): void => {
+  if (!selectedImage.value) {
+    return;
+  }
+
+  isLightboxOpen.value = true;
+};
+
+const closeLightbox = async (isOpen: boolean): Promise<void> => {
+  isLightboxOpen.value = isOpen;
+
+  if (!isOpen) {
+    await nextTick();
+    imageTrigger.value?.focus();
+  }
+};
 
 const onPhoneInput = (event: Event): void => {
   form.phone = formatPhone((event.target as HTMLInputElement).value);
@@ -76,13 +100,22 @@ const toggleFavorite = (): void => {
     <article class="grid gap-8 lg:grid-cols-[1fr_380px]">
       <section class="space-y-5">
         <div class="overflow-hidden rounded-lg border bg-white">
-          <div class="aspect-[16/10] bg-slate-100">
-            <img
+          <div class="aspect-[16/10] bg-slate-100 p-3">
+            <button
               v-if="selectedImage"
-              :src="selectedImage"
-              :alt="listing.title"
-              class="h-full w-full object-cover"
-            />
+              ref="imageTrigger"
+              class="group relative h-full w-full cursor-zoom-in rounded-md focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:outline-none"
+              type="button"
+              aria-label="Ampliar imagem do anuncio"
+              @click="openLightbox"
+            >
+              <img :src="selectedImage" :alt="listing.title" class="h-full w-full object-contain" />
+              <span
+                class="absolute right-3 bottom-3 rounded-full bg-slate-950/70 p-2 text-white opacity-0 transition group-hover:opacity-100 group-focus:opacity-100"
+              >
+                <Maximize2 class="h-4 w-4" aria-hidden="true" />
+              </span>
+            </button>
             <div v-else class="flex h-full items-center justify-center text-slate-400">
               Sem imagem
             </div>
@@ -93,12 +126,12 @@ const toggleFavorite = (): void => {
               :key="image.id"
               class="h-20 w-24 shrink-0 overflow-hidden rounded-md border"
               type="button"
-              @click="selectedImage = image.url"
+              @click="selectImage(image.url)"
             >
               <img
                 :src="image.url"
                 :alt="image.alt_text || listing.title"
-                class="h-full w-full object-cover"
+                class="h-full w-full object-contain"
               />
             </button>
           </div>
@@ -263,5 +296,13 @@ const toggleFavorite = (): void => {
         </form>
       </aside>
     </article>
+    <ListingImageLightbox
+      :images="listing.images"
+      :model-value="isLightboxOpen"
+      :selected-image-url="selectedImage"
+      :listing-title="listing.title"
+      @select="selectImage($event.url)"
+      @update:model-value="closeLightbox"
+    />
   </AppLayout>
 </template>
