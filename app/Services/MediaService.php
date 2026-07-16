@@ -19,6 +19,10 @@ class MediaService
         $isImage = Str::startsWith((string) $file->getMimeType(), 'image/');
 
         if ($isImage) {
+            if (! function_exists('imagewebp') && ! function_exists('imagejpeg')) {
+                return $this->storeOriginalImage($file, $user, $directory, $disk, $altText);
+            }
+
             $image = Image::read($file)->scaleDown(width: (int) config('media.image.max_width'));
             $supportsWebp = function_exists('imagewebp');
             $extension = $supportsWebp ? 'webp' : 'jpg';
@@ -68,5 +72,35 @@ class MediaService
     {
         Storage::disk($asset->disk)->delete($asset->path);
         $asset->delete();
+    }
+
+    private function storeOriginalImage(
+        UploadedFile $file,
+        User $user,
+        string $directory,
+        string $disk,
+        ?string $altText,
+    ): MediaAsset {
+        $extension = $file->extension() ?: 'image';
+        $path = $file->storeAs($directory, Str::ulid().'.'.$extension, $disk);
+
+        if (! $path) {
+            throw new RuntimeException('Nao foi possivel armazenar a imagem.');
+        }
+
+        $dimensions = @getimagesize($file->getRealPath());
+
+        return MediaAsset::create([
+            'user_id' => $user->id,
+            'disk' => $disk,
+            'path' => $path,
+            'original_name' => $file->getClientOriginalName(),
+            'mime_type' => $file->getMimeType(),
+            'size' => $file->getSize(),
+            'kind' => 'image',
+            'width' => $dimensions[0] ?? null,
+            'height' => $dimensions[1] ?? null,
+            'alt_text' => $altText,
+        ]);
     }
 }
