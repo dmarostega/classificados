@@ -201,6 +201,7 @@ const copy = async (field: string, value: string): Promise<void> => {
             v-if="listing.public_url"
             class="inline-flex items-center gap-2 text-sm font-medium underline"
             :href="listing.public_url"
+            rel="noopener noreferrer"
             target="_blank"
             ><ExternalLink class="h-4 w-4" />Ver anuncio publico</a
           >
