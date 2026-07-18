@@ -77,6 +77,7 @@ export interface ListingCard {
   url?: string;
   cover_url: string | null;
   edit_url?: string;
+  publish_url?: string;
   public_url?: string | null;
   is_favorited?: boolean;
   is_featured?: boolean;
