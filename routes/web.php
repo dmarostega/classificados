@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ListingController;
 use App\Http\Controllers\Admin\ListingFeaturedController;
+use App\Http\Controllers\Admin\MarketplaceListingController;
 use App\Http\Controllers\AdvertiserProfileController;
 use App\Http\Controllers\AuthPageController;
 use App\Http\Controllers\DashboardController;
@@ -45,6 +46,8 @@ Route::middleware('auth')->group(function (): void {
         ->parameters(['anuncios' => 'listing'])
         ->names('admin.listings')
         ->except('show');
+    Route::get('/admin/anuncios/{listing}/publicar', [MarketplaceListingController::class, 'show'])
+        ->name('admin.listings.publish');
     Route::post('/admin/anuncios/{listing}/destaque', [ListingFeaturedController::class, 'store'])->name('admin.listings.featured.store');
     Route::delete('/admin/anuncios/{listing}/destaque', [ListingFeaturedController::class, 'destroy'])->name('admin.listings.featured.destroy');
     Route::patch('/perfil-anunciante', [AdvertiserProfileController::class, 'update'])->name('advertiser-profile.update');

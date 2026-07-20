@@ -5,7 +5,7 @@ import SeoHead from '@/components/SeoHead.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { ListingCard, Paginated, SelectOption, SeoData } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
-import { Pencil, Plus, Search, Star, Trash2 } from '@lucide/vue';
+import { Pencil, Plus, Send, Search, Star, Trash2 } from '@lucide/vue';
 import { reactive } from 'vue';
 
 const props = defineProps<{
@@ -98,6 +98,13 @@ const toggleFeatured = (listing: ListingCard): void => {
               </p>
             </div>
             <div class="flex items-center gap-2">
+              <Link
+                class="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
+                :href="listing.publish_url || '#'"
+              >
+                <Send class="h-4 w-4" />
+                Preparar para marketplaces
+              </Link>
               <button
                 v-if="listing.public_url"
                 class="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"

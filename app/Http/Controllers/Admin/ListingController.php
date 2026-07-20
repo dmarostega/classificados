@@ -133,6 +133,7 @@ class ListingController extends Controller
             'cover_url' => $images->coverUrl($listing),
             'is_featured' => $listing->id === auth()->user()?->featured_listing_id,
             'edit_url' => route('admin.listings.edit', $listing),
+            'publish_url' => route('admin.listings.publish', $listing),
             'public_url' => $listing->status->isPublic() ? route('listings.show', $listing->slug) : null,
         ];
     }
