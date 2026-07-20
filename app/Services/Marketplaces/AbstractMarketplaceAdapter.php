@@ -36,6 +36,7 @@ abstract class AbstractMarketplaceAdapter implements MarketplaceAdapterInterface
         return [
             'A publicacao final deve ser feita manualmente no marketplace escolhido.',
             'Este assistente nao solicita nem armazena credenciais de plataformas externas.',
+            'Revise o texto e remova dados pessoais antes de compartilhar o anuncio.',
         ];
     }
 }

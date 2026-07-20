@@ -5,6 +5,7 @@ use App\Models\Category;
 use App\Models\Listing;
 use App\Models\User;
 use App\Services\Marketplaces\MarketplaceDraftService;
+use App\Services\Marketplaces\MarketplaceListingInput;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function marketplaceListing(User $user): Listing
@@ -59,4 +60,19 @@ it('shows marketplace drafts only to the listing owner', function (): void {
     $this->actingAs(User::factory()->create())
         ->get("/admin/anuncios/{$listing->id}/publicar")
         ->assertForbidden();
+});
+
+it('does not include a public link for listings that are not publicly visible', function (): void {
+    $listing = marketplaceListing(User::factory()->create());
+    $listing->update([
+        'status' => ListingStatus::Draft,
+        'published_at' => null,
+    ]);
+    $listing->load('category');
+
+    $input = MarketplaceListingInput::fromListing($listing);
+    $drafts = app(MarketplaceDraftService::class)->draftsFor($listing);
+
+    expect($input->publicUrl)->toBeNull()
+        ->and(implode("\n", array_column($drafts, 'full_text')))->not->toContain('/anuncios/');
 });

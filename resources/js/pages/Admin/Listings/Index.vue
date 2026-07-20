@@ -103,7 +103,7 @@ const toggleFeatured = (listing: ListingCard): void => {
                 :href="listing.publish_url || '#'"
               >
                 <Send class="h-4 w-4" />
-                Publicar
+                Preparar para marketplaces
               </Link>
               <button
                 v-if="listing.public_url"
