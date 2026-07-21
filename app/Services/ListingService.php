@@ -93,6 +93,7 @@ class ListingService
             'quick_sale' => $data['quick_sale'] ?? $listing?->quick_sale ?? false,
             'negotiable_price' => $data['negotiable_price'] ?? $listing?->negotiable_price ?? false,
             'easy_pickup' => $data['easy_pickup'] ?? $listing?->easy_pickup ?? false,
+            'is_reserved' => $data['is_reserved'] ?? $listing?->is_reserved ?? false,
             'city' => $data['city'],
             'state' => Str::upper($data['state']),
             'contact_name' => $data['contact_name'],

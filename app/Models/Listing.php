@@ -12,6 +12,7 @@ use Illuminate\Support\Carbon;
 class Listing extends Model
 {
     private const COMMERCIAL_BADGES = [
+        'is_reserved' => 'Reservado',
         'accepts_offers' => 'Aceita proposta',
         'quick_sale' => 'Venda rápida',
         'negotiable_price' => 'Preço negociável',
@@ -29,6 +30,7 @@ class Listing extends Model
         'quick_sale',
         'negotiable_price',
         'easy_pickup',
+        'is_reserved',
         'city',
         'state',
         'contact_name',
@@ -48,6 +50,7 @@ class Listing extends Model
             'quick_sale' => 'boolean',
             'negotiable_price' => 'boolean',
             'easy_pickup' => 'boolean',
+            'is_reserved' => 'boolean',
             'status' => ListingStatus::class,
             'published_at' => 'datetime',
             'expires_at' => 'datetime',

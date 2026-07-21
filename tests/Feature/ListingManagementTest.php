@@ -69,6 +69,7 @@ it('stores commercial badges and exposes only selected badges publicly', functio
         'quick_sale' => true,
         'negotiable_price' => false,
         'easy_pickup' => false,
+        'is_reserved' => true,
         'city' => 'Maringa',
         'state' => 'PR',
         'contact_name' => 'Anunciante',
@@ -80,16 +81,19 @@ it('stores commercial badges and exposes only selected badges publicly', functio
     expect($listing->accepts_offers)->toBeTrue()
         ->and($listing->quick_sale)->toBeTrue()
         ->and($listing->negotiable_price)->toBeFalse()
-        ->and($listing->easy_pickup)->toBeFalse();
+        ->and($listing->easy_pickup)->toBeFalse()
+        ->and($listing->is_reserved)->toBeTrue();
 
     $this->get('/anuncios')
         ->assertInertia(fn (Assert $page) => $page->where('listings.data.0.commercial_badges', [
+            'Reservado',
             'Aceita proposta',
             'Venda rápida',
         ]));
 
     $this->get("/anuncios/{$listing->slug}")
         ->assertInertia(fn (Assert $page) => $page->where('listing.commercial_badges', [
+            'Reservado',
             'Aceita proposta',
             'Venda rápida',
         ]));

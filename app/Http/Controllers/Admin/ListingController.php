@@ -129,6 +129,7 @@ class ListingController extends Controller
             'quick_sale' => $listing->quick_sale,
             'negotiable_price' => $listing->negotiable_price,
             'easy_pickup' => $listing->easy_pickup,
+            'is_reserved' => $listing->is_reserved,
             'city' => $listing->city,
             'state' => $listing->state,
             'status' => $listing->status->value,

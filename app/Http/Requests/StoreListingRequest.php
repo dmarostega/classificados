@@ -22,6 +22,7 @@ class StoreListingRequest extends FormRequest
             'quick_sale' => $this->boolean('quick_sale'),
             'negotiable_price' => $this->boolean('negotiable_price'),
             'easy_pickup' => $this->boolean('easy_pickup'),
+            'is_reserved' => $this->boolean('is_reserved'),
         ]);
     }
 
@@ -38,6 +39,7 @@ class StoreListingRequest extends FormRequest
             'quick_sale' => ['boolean'],
             'negotiable_price' => ['boolean'],
             'easy_pickup' => ['boolean'],
+            'is_reserved' => ['boolean'],
             'city' => [
                 'required',
                 'string',

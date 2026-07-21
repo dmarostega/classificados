@@ -30,6 +30,7 @@ const form = useForm({
   quick_sale: props.listing?.quick_sale || false,
   negotiable_price: props.listing?.negotiable_price || false,
   easy_pickup: props.listing?.easy_pickup || false,
+  is_reserved: props.listing?.is_reserved || false,
   city: props.listing?.city || '',
   state: props.listing?.state || '',
   contact_name: props.listing?.contact_name || '',
@@ -197,6 +198,14 @@ const submit = (): void => {
               Retirada facilitada
             </label>
           </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="sr-only">Disponibilidade</legend>
+          <label class="flex items-center gap-2 text-sm font-medium">
+            <input v-model="form.is_reserved" type="checkbox" />
+            Item reservado
+          </label>
         </fieldset>
 
         <div class="grid gap-4 md:grid-cols-[90px_1fr]">
