@@ -37,7 +37,12 @@ defineProps<{ listing: ListingCardData }>();
         <span
           v-for="badge in listing.commercial_badges"
           :key="badge"
-          class="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700"
+          class="rounded-full px-2 py-1 text-xs font-medium"
+          :class="
+            badge === 'Reservado'
+              ? 'bg-amber-100 text-amber-900 ring-1 ring-amber-300'
+              : 'bg-slate-100 text-slate-700'
+          "
         >
           {{ badge }}
         </span>

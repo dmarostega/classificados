@@ -102,6 +102,7 @@ export interface ListingDetail extends ListingCard {
   quick_sale?: boolean;
   negotiable_price?: boolean;
   easy_pickup?: boolean;
+  is_reserved?: boolean;
   contact_name: string;
   contact_email?: string | null;
   contact_phone?: string | null;
