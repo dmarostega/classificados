@@ -24,6 +24,8 @@ function marketplaceListing(User $user): Listing
         'slug' => 'notebook-dell-inspiron',
         'description' => 'Notebook conservado, com carregador original e pronto para uso.',
         'price_cents' => 250000,
+        'accepts_offers' => true,
+        'quick_sale' => true,
         'city' => 'Maringa',
         'state' => 'PR',
         'contact_name' => 'Anunciante',
@@ -41,6 +43,7 @@ it('generates manual drafts for every supported marketplace', function (): void 
     expect($drafts)->toHaveCount(4)
         ->and(array_column($drafts, 'marketplace'))->toBe(['facebook', 'olx', 'whatsapp', 'generic'])
         ->and($drafts[2]['full_text'])->toContain('R$ 2.500,00')
+        ->and($drafts[0]['full_text'])->toContain('Condições comerciais: Aceita proposta · Venda rápida')
         ->and($drafts[0]['warnings'][0])->toContain('manualmente')
         ->and($drafts[1]['suggested_category'])->toBe('Eletronicos');
 });

@@ -110,7 +110,7 @@ class Listing extends Model
     public function commercialBadges(): array
     {
         return collect(self::COMMERCIAL_BADGES)
-            ->filter(fn (string $label, string $attribute): bool => $this->{$attribute})
+            ->filter(fn (string $label, string $attribute): bool => (bool) $this->{$attribute})
             ->values()
             ->all();
     }

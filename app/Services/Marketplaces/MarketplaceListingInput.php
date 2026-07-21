@@ -12,6 +12,8 @@ final readonly class MarketplaceListingInput
         public string $price,
         public ?string $category,
         public string $location,
+        /** @var list<string> */
+        public array $commercialBadges,
         public ?string $publicUrl,
     ) {}
 
@@ -23,6 +25,7 @@ final readonly class MarketplaceListingInput
             price: $listing->formattedPrice(),
             category: $listing->category?->name,
             location: "{$listing->city} / {$listing->state}",
+            commercialBadges: $listing->commercialBadges(),
             publicUrl: $listing->isPubliclyVisible() ? $listing->publicUrl() : null,
         );
     }
