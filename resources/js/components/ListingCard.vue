@@ -33,6 +33,15 @@ defineProps<{ listing: ListingCardData }>();
       <p class="text-xs font-semibold text-slate-500 uppercase">{{ listing.category }}</p>
       <h2 class="line-clamp-2 min-h-12 font-semibold">{{ listing.title }}</h2>
       <p class="text-lg font-bold">{{ listing.price }}</p>
+      <div v-if="listing.commercial_badges?.length" class="flex flex-wrap gap-1.5">
+        <span
+          v-for="badge in listing.commercial_badges"
+          :key="badge"
+          class="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700"
+        >
+          {{ badge }}
+        </span>
+      </div>
       <p class="text-sm text-slate-500">{{ listing.city }} / {{ listing.state }}</p>
     </div>
   </Link>

@@ -143,6 +143,15 @@ const toggleFavorite = (): void => {
           </p>
           <h1 class="mt-2 text-3xl font-bold">{{ listing.title }}</h1>
           <p class="mt-2 text-2xl font-bold">{{ listing.price }}</p>
+          <div v-if="listing.commercial_badges?.length" class="mt-3 flex flex-wrap gap-2">
+            <span
+              v-for="badge in listing.commercial_badges"
+              :key="badge"
+              class="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700"
+            >
+              {{ badge }}
+            </span>
+          </div>
           <p class="mt-2 text-sm text-slate-500">{{ listing.city }} / {{ listing.state }}</p>
           <div class="prose prose-slate mt-6 max-w-none whitespace-pre-line">
             {{ listing.description }}

@@ -61,6 +61,7 @@ class PublicAdvertiserController extends Controller
             'slug' => $listing->slug,
             'category' => $listing->category?->name,
             'price' => $listing->formattedPrice(),
+            'commercial_badges' => $listing->commercialBadges(),
             'city' => $listing->city,
             'state' => $listing->state,
             'published_at' => $listing->published_at?->toDateString(),

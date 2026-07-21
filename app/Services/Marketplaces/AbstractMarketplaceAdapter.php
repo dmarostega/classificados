@@ -9,6 +9,9 @@ abstract class AbstractMarketplaceAdapter implements MarketplaceAdapterInterface
         return trim(implode("\n\n", array_filter([
             $listing->description,
             "Preco: {$listing->price}",
+            $listing->commercialBadges
+                ? 'Condições comerciais: '.implode(' · ', $listing->commercialBadges)
+                : null,
             "Localizacao: {$listing->location}",
             $listing->publicUrl ? "Mais detalhes e fotos: {$listing->publicUrl}" : null,
         ])));
