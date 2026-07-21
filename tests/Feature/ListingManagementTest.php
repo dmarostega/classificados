@@ -13,6 +13,7 @@ use Database\Seeders\LocationSeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function (): void {
     $this->seed(LocationSeeder::class);
@@ -53,6 +54,45 @@ it('creates a user scoped listing from the admin panel', function (): void {
         ->and($listing->city)->toBe('Maringa')
         ->and($listing->state)->toBe('PR')
         ->and($listing->published_at)->not->toBeNull();
+});
+
+it('stores commercial badges and exposes only selected badges publicly', function (): void {
+    $user = User::factory()->create();
+    $category = categoryForListings();
+
+    $this->actingAs($user)->post('/admin/anuncios', [
+        'category_id' => $category->id,
+        'title' => 'Bicicleta com condicoes especiais',
+        'description' => 'Bicicleta revisada e pronta para retirada imediata.',
+        'price' => '1200.00',
+        'accepts_offers' => true,
+        'quick_sale' => true,
+        'negotiable_price' => false,
+        'easy_pickup' => false,
+        'city' => 'Maringa',
+        'state' => 'PR',
+        'contact_name' => 'Anunciante',
+        'status' => ListingStatus::Published->value,
+    ])->assertRedirect();
+
+    $listing = Listing::query()->sole();
+
+    expect($listing->accepts_offers)->toBeTrue()
+        ->and($listing->quick_sale)->toBeTrue()
+        ->and($listing->negotiable_price)->toBeFalse()
+        ->and($listing->easy_pickup)->toBeFalse();
+
+    $this->get('/anuncios')
+        ->assertInertia(fn (Assert $page) => $page->where('listings.data.0.commercial_badges', [
+            'Aceita proposta',
+            'Venda rápida',
+        ]));
+
+    $this->get("/anuncios/{$listing->slug}")
+        ->assertInertia(fn (Assert $page) => $page->where('listing.commercial_badges', [
+            'Aceita proposta',
+            'Venda rápida',
+        ]));
 });
 
 it('rejects listings with cities that do not belong to the selected state', function (): void {

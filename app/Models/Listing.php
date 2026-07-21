@@ -11,6 +11,13 @@ use Illuminate\Support\Carbon;
 
 class Listing extends Model
 {
+    private const COMMERCIAL_BADGES = [
+        'accepts_offers' => 'Aceita proposta',
+        'quick_sale' => 'Venda rápida',
+        'negotiable_price' => 'Preço negociável',
+        'easy_pickup' => 'Retirada facilitada',
+    ];
+
     protected $fillable = [
         'user_id',
         'category_id',
@@ -18,6 +25,10 @@ class Listing extends Model
         'slug',
         'description',
         'price_cents',
+        'accepts_offers',
+        'quick_sale',
+        'negotiable_price',
+        'easy_pickup',
         'city',
         'state',
         'contact_name',
@@ -33,6 +44,10 @@ class Listing extends Model
     {
         return [
             'price_cents' => 'integer',
+            'accepts_offers' => 'boolean',
+            'quick_sale' => 'boolean',
+            'negotiable_price' => 'boolean',
+            'easy_pickup' => 'boolean',
             'status' => ListingStatus::class,
             'published_at' => 'datetime',
             'expires_at' => 'datetime',
@@ -90,6 +105,14 @@ class Listing extends Model
     public function formattedPrice(): string
     {
         return 'R$ '.number_format($this->price_cents / 100, 2, ',', '.');
+    }
+
+    public function commercialBadges(): array
+    {
+        return collect(self::COMMERCIAL_BADGES)
+            ->filter(fn (string $label, string $attribute): bool => $this->{$attribute})
+            ->values()
+            ->all();
     }
 
     public function maskedContactPhone(): ?string

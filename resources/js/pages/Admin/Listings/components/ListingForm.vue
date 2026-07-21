@@ -26,6 +26,10 @@ const form = useForm({
   title: props.listing?.title || '',
   description: props.listing?.description || '',
   price: props.listing?.price_value || '',
+  accepts_offers: props.listing?.accepts_offers || false,
+  quick_sale: props.listing?.quick_sale || false,
+  negotiable_price: props.listing?.negotiable_price || false,
+  easy_pickup: props.listing?.easy_pickup || false,
   city: props.listing?.city || '',
   state: props.listing?.state || '',
   contact_name: props.listing?.contact_name || '',
@@ -172,6 +176,28 @@ const submit = (): void => {
             />
           </div>
         </div>
+
+        <fieldset class="space-y-2">
+          <legend class="text-sm font-medium">Condições comerciais</legend>
+          <div class="grid gap-2 sm:grid-cols-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input v-model="form.accepts_offers" type="checkbox" />
+              Aceita proposta
+            </label>
+            <label class="flex items-center gap-2 text-sm">
+              <input v-model="form.quick_sale" type="checkbox" />
+              Venda rápida
+            </label>
+            <label class="flex items-center gap-2 text-sm">
+              <input v-model="form.negotiable_price" type="checkbox" />
+              Preço negociável
+            </label>
+            <label class="flex items-center gap-2 text-sm">
+              <input v-model="form.easy_pickup" type="checkbox" />
+              Retirada facilitada
+            </label>
+          </div>
+        </fieldset>
 
         <div class="grid gap-4 md:grid-cols-[90px_1fr]">
           <div>
