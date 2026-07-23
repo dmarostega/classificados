@@ -2,7 +2,8 @@
 import SeoHead from '@/components/SeoHead.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { SeoData } from '@/types';
-import { Link } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 defineProps<{
   seo: SeoData;
@@ -15,7 +16,25 @@ defineProps<{
     price: string;
     edit_url: string;
   }>;
+  advertiserProfile: { og_image_url: string | null };
 }>();
+
+const profileForm = useForm({
+  _method: 'patch',
+  og_image: null as File | null,
+  remove_og_image: false,
+});
+const ogImageInput = ref<HTMLInputElement | null>(null);
+const submitProfile = (): void => profileForm.post('/perfil-anunciante', { forceFormData: true });
+const onOgImageChange = (event: Event): void => {
+  profileForm.og_image = (event.target as HTMLInputElement).files?.[0] || null;
+  profileForm.remove_og_image = false;
+};
+const removeOgImage = (): void => {
+  profileForm.og_image = null;
+  profileForm.remove_og_image = true;
+  submitProfile();
+};
 </script>
 
 <template>
@@ -53,6 +72,45 @@ defineProps<{
           <p class="mt-2 text-3xl font-bold">{{ metrics.views }}</p>
         </div>
       </div>
+
+      <form class="rounded-lg border bg-white p-5" @submit.prevent="submitProfile">
+        <h2 class="font-semibold">Imagem para compartilhamento</h2>
+        <p class="mt-1 text-sm text-slate-500">
+          Opcional. Use JPG, PNG ou WebP horizontal (ideal: 1200 × 630 px), de ate 10 MB.
+        </p>
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <img
+            v-if="advertiserProfile.og_image_url"
+            :src="advertiserProfile.og_image_url"
+            alt="Imagem atual de compartilhamento"
+            class="h-20 w-32 rounded border object-cover"
+          />
+          <input
+            ref="ogImageInput"
+            accept="image/jpeg,image/png,image/webp"
+            type="file"
+            @change="onOgImageChange"
+          />
+          <button
+            class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+            :disabled="!profileForm.og_image || profileForm.processing"
+          >
+            Salvar imagem
+          </button>
+          <button
+            v-if="advertiserProfile.og_image_url"
+            class="rounded-md border px-4 py-2 text-sm font-medium text-red-700"
+            type="button"
+            :disabled="profileForm.processing"
+            @click="removeOgImage"
+          >
+            Remover imagem
+          </button>
+        </div>
+        <p v-if="profileForm.errors.og_image" class="mt-2 text-sm text-red-700">
+          {{ profileForm.errors.og_image }}
+        </p>
+      </form>
 
       <div class="rounded-lg border bg-white">
         <div class="flex items-center justify-between border-b px-5 py-4">

@@ -31,6 +31,9 @@ const props = defineProps<{
         >
           Ver publicado
         </a>
+        <a class="rounded-md border px-4 py-2 font-medium" :href="listing.publish_url">
+          Preparar para marketplaces
+        </a>
       </div>
       <ListingForm
         :listing="listing"

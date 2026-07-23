@@ -69,6 +69,7 @@ export interface ListingCard {
   category: string | null;
   price: string;
   price_value?: string;
+  commercial_badges?: string[];
   city: string;
   state: string;
   status?: string;
@@ -77,8 +78,10 @@ export interface ListingCard {
   url?: string;
   cover_url: string | null;
   edit_url?: string;
+  publish_url?: string;
   public_url?: string | null;
   is_favorited?: boolean;
+  is_featured?: boolean;
 }
 
 export interface AdvertiserSummary {
@@ -95,6 +98,11 @@ export interface ListingPhoneReveal {
 export interface ListingDetail extends ListingCard {
   description: string;
   category_id?: number;
+  accepts_offers?: boolean;
+  quick_sale?: boolean;
+  negotiable_price?: boolean;
+  easy_pickup?: boolean;
+  is_reserved?: boolean;
   contact_name: string;
   contact_email?: string | null;
   contact_phone?: string | null;

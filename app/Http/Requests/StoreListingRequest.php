@@ -18,6 +18,11 @@ class StoreListingRequest extends FormRequest
     {
         $this->merge([
             'state' => str($this->input('state'))->upper()->toString(),
+            'accepts_offers' => $this->boolean('accepts_offers'),
+            'quick_sale' => $this->boolean('quick_sale'),
+            'negotiable_price' => $this->boolean('negotiable_price'),
+            'easy_pickup' => $this->boolean('easy_pickup'),
+            'is_reserved' => $this->boolean('is_reserved'),
         ]);
     }
 
@@ -30,6 +35,11 @@ class StoreListingRequest extends FormRequest
             'title' => ['required', 'string', 'max:120'],
             'description' => ['required', 'string', 'min:20', 'max:5000'],
             'price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
+            'accepts_offers' => ['boolean'],
+            'quick_sale' => ['boolean'],
+            'negotiable_price' => ['boolean'],
+            'easy_pickup' => ['boolean'],
+            'is_reserved' => ['boolean'],
             'city' => [
                 'required',
                 'string',

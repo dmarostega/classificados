@@ -19,9 +19,18 @@ class MediaService
         $isImage = Str::startsWith((string) $file->getMimeType(), 'image/');
 
         if ($isImage) {
+            if (! function_exists('imagewebp') && ! function_exists('imagejpeg')) {
+                return $this->storeOriginalImage($file, $user, $directory, $disk, $altText);
+            }
+
             $image = Image::read($file)->scaleDown(width: (int) config('media.image.max_width'));
-            $contents = $image->toWebp(quality: (int) config('media.image.quality'));
-            $path = $directory.'/'.Str::ulid().'.webp';
+            $supportsWebp = function_exists('imagewebp');
+            $extension = $supportsWebp ? 'webp' : 'jpg';
+            $mimeType = $supportsWebp ? 'image/webp' : 'image/jpeg';
+            $contents = $supportsWebp
+                ? $image->toWebp(quality: (int) config('media.image.quality'))
+                : $image->toJpeg(quality: (int) config('media.image.quality'));
+            $path = $directory.'/'.Str::ulid().'.'.$extension;
 
             if (! Storage::disk($disk)->put($path, (string) $contents)) {
                 throw new RuntimeException('Não foi possível armazenar a imagem.');
@@ -32,7 +41,7 @@ class MediaService
                 'disk' => $disk,
                 'path' => $path,
                 'original_name' => $file->getClientOriginalName(),
-                'mime_type' => 'image/webp',
+                'mime_type' => $mimeType,
                 'size' => Storage::disk($disk)->size($path),
                 'kind' => 'image',
                 'width' => $image->width(),
@@ -63,5 +72,35 @@ class MediaService
     {
         Storage::disk($asset->disk)->delete($asset->path);
         $asset->delete();
+    }
+
+    private function storeOriginalImage(
+        UploadedFile $file,
+        User $user,
+        string $directory,
+        string $disk,
+        ?string $altText,
+    ): MediaAsset {
+        $extension = $file->extension() ?: 'image';
+        $path = $file->storeAs($directory, Str::ulid().'.'.$extension, $disk);
+
+        if (! $path) {
+            throw new RuntimeException('Nao foi possivel armazenar a imagem.');
+        }
+
+        $dimensions = @getimagesize($file->getRealPath());
+
+        return MediaAsset::create([
+            'user_id' => $user->id,
+            'disk' => $disk,
+            'path' => $path,
+            'original_name' => $file->getClientOriginalName(),
+            'mime_type' => $file->getMimeType(),
+            'size' => $file->getSize(),
+            'kind' => 'image',
+            'width' => $dimensions[0] ?? null,
+            'height' => $dimensions[1] ?? null,
+            'alt_text' => $altText,
+        ]);
     }
 }
