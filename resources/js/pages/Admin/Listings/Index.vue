@@ -97,7 +97,7 @@ const toggleFeatured = (listing: ListingCard): void => {
                 Anuncio em destaque
               </p>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
               <Link
                 class="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
                 :href="listing.publish_url || '#'"

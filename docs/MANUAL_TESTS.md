@@ -1,5 +1,7 @@
 # Roadmap de teste manual
 
+Nota de release: em "Meus anuncios", validar as acoes Preparar para marketplaces, destaque, Editar e Excluir em 320, 375 e 768 px; elas devem quebrar linha sem gerar rolagem horizontal. Ao trocar de marketplace apos uma copia, o feedback "Copiado" deve ser limpo.
+
 1. Configurar `.env` com MySQL, rodar `php artisan migrate --seed` e confirmar `php artisan storage:link`.
 2. Criar um usuario, acessar `/dashboard` e cadastrar um anuncio em `/admin/anuncios/create`.
 3. Confirmar que os selects pesquisaveis filtram categoria, status, UF e cidade; abrir um select, clicar no campo de busca, digitar, selecionar opcao filtrada e limpar quando houver botao de limpar.

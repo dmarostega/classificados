@@ -50,6 +50,12 @@ const copy = async (field: string, value: string): Promise<void> => {
     copyError.value = 'Nao foi possivel copiar agora. Selecione o texto e copie manualmente.';
   }
 };
+
+const selectMarketplace = (marketplace: string): void => {
+  selectedMarketplace.value = marketplace;
+  copiedField.value = null;
+  copyError.value = null;
+};
 </script>
 
 <template>
@@ -107,7 +113,7 @@ const copy = async (field: string, value: string): Promise<void> => {
           type="button"
           role="tab"
           :aria-selected="selectedMarketplace === draft.marketplace"
-          @click="selectedMarketplace = draft.marketplace"
+          @click="selectMarketplace(draft.marketplace)"
         >
           {{ draft.label }}
         </button>
