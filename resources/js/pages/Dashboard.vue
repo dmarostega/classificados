@@ -19,9 +19,13 @@ defineProps<{
   advertiserProfile: { og_image_url: string | null };
 }>();
 
-const profileForm = useForm({ og_image: null as File | null, remove_og_image: false });
+const profileForm = useForm({
+  _method: 'patch',
+  og_image: null as File | null,
+  remove_og_image: false,
+});
 const ogImageInput = ref<HTMLInputElement | null>(null);
-const submitProfile = (): void => profileForm.patch('/perfil-anunciante', { forceFormData: true });
+const submitProfile = (): void => profileForm.post('/perfil-anunciante', { forceFormData: true });
 const onOgImageChange = (event: Event): void => {
   profileForm.og_image = (event.target as HTMLInputElement).files?.[0] || null;
   profileForm.remove_og_image = false;

@@ -13,19 +13,21 @@ class AdvertiserProfileController extends Controller
         $user = $request->user();
         $currentImage = $user->ogImage;
 
-        if ($request->boolean('remove_og_image') || $request->hasFile('og_image')) {
+        if ($request->hasFile('og_image')) {
+            $image = $media->store($request->file('og_image'), $user, "Imagem de compartilhamento de {$user->name}");
+            $user->ogImage()->associate($image);
+            $user->save();
+
+            if ($currentImage) {
+                $media->delete($currentImage);
+            }
+        } elseif ($request->boolean('remove_og_image')) {
             $user->ogImage()->dissociate();
             $user->save();
 
             if ($currentImage) {
                 $media->delete($currentImage);
             }
-        }
-
-        if ($request->hasFile('og_image')) {
-            $image = $media->store($request->file('og_image'), $user, "Imagem de compartilhamento de {$user->name}");
-            $user->ogImage()->associate($image);
-            $user->save();
         }
 
         return back()->with('success', 'Imagem de compartilhamento atualizada.');
