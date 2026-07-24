@@ -9,18 +9,19 @@ const paginationLabel = (label: string): string =>
 </script>
 
 <template>
-  <nav class="flex flex-wrap gap-2" aria-label="Paginacao">
+  <nav class="flex flex-wrap gap-1.5" aria-label="Paginacao">
     <component
       :is="link.url ? Link : 'span'"
       v-for="link in links"
       :key="link.label"
       :href="link.url || undefined"
-      class="rounded-md border px-3 py-2 text-sm"
+      class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-3 text-sm font-semibold transition-colors"
       :class="[
         link.active
-          ? 'border-slate-900 bg-slate-900 text-white'
-          : 'border-slate-200 bg-white text-slate-700',
-        !link.url ? 'opacity-50' : 'hover:border-slate-400',
+          ? 'bg-brand-500 text-white'
+          : link.url
+            ? 'hover:border-brand-400 hover:text-brand-600 border border-zinc-200 bg-white text-zinc-700'
+            : 'border border-zinc-100 bg-zinc-50 text-zinc-300',
       ]"
     >
       {{ paginationLabel(link.label) }}
