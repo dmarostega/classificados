@@ -9,6 +9,7 @@ import {
   LogOut,
   Plus,
   Search,
+  Tag,
   UserPlus,
 } from '@lucide/vue';
 import { computed } from 'vue';
@@ -23,10 +24,15 @@ const logout = (): void => router.post('/logout');
   <div class="min-h-screen bg-slate-50 text-slate-900">
     <header class="border-b border-slate-200 bg-white/95 backdrop-blur">
       <nav class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4">
-        <Link href="/" class="text-lg font-bold tracking-tight">{{ page.props.appName }}</Link>
+        <Link href="/" class="inline-flex items-center gap-2 text-lg font-bold tracking-tight">
+          <span class="bg-brand-600 inline-flex h-7 w-7 items-center justify-center rounded-lg">
+            <Tag class="h-4 w-4 text-white" />
+          </span>
+          {{ page.props.appName }}
+        </Link>
         <div class="flex flex-wrap items-center gap-3 text-sm">
           <Link
-            class="inline-flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100"
+            class="hover:bg-brand-50 hover:text-brand-700 inline-flex items-center gap-2 rounded-md px-3 py-2 text-slate-700"
             href="/anuncios"
           >
             <Search class="h-4 w-4" />
@@ -34,28 +40,28 @@ const logout = (): void => router.post('/logout');
           </Link>
           <template v-if="user">
             <Link
-              class="inline-flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100"
+              class="hover:bg-brand-50 hover:text-brand-700 inline-flex items-center gap-2 rounded-md px-3 py-2 text-slate-700"
               href="/favoritos"
             >
               <Heart class="h-4 w-4" />
               Favoritos
             </Link>
             <Link
-              class="inline-flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100"
+              class="hover:bg-brand-50 hover:text-brand-700 inline-flex items-center gap-2 rounded-md px-3 py-2 text-slate-700"
               href="/dashboard"
             >
               <LayoutDashboard class="h-4 w-4" />
               Painel
             </Link>
             <Link
-              class="inline-flex items-center gap-2 rounded-md bg-slate-900 px-3 py-2 font-medium text-white hover:bg-slate-700"
+              class="bg-brand-600 hover:bg-brand-700 inline-flex items-center gap-2 rounded-md px-3 py-2 font-medium text-white"
               href="/admin/anuncios/create"
             >
               <Plus class="h-4 w-4" />
               Novo
             </Link>
             <button
-              class="inline-flex items-center gap-2 rounded-md px-3 py-2 hover:bg-slate-100"
+              class="hover:bg-brand-50 hover:text-brand-700 inline-flex items-center gap-2 rounded-md px-3 py-2 text-slate-700"
               type="button"
               @click="logout"
             >
@@ -64,9 +70,13 @@ const logout = (): void => router.post('/logout');
             </button>
           </template>
           <template v-else>
-            <Link class="rounded-md px-3 py-2 hover:bg-slate-100" href="/login">Entrar</Link>
             <Link
-              class="inline-flex items-center gap-2 rounded-md bg-slate-900 px-3 py-2 font-medium text-white hover:bg-slate-700"
+              class="hover:bg-brand-50 hover:text-brand-700 rounded-md px-3 py-2 text-slate-700"
+              href="/login"
+              >Entrar</Link
+            >
+            <Link
+              class="bg-brand-600 hover:bg-brand-700 inline-flex items-center gap-2 rounded-md px-3 py-2 font-medium text-white"
               href="/register"
             >
               <UserPlus class="h-4 w-4" />
