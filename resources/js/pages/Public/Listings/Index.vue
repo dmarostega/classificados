@@ -36,6 +36,13 @@ const categoryOptions = computed(() =>
   })),
 );
 
+const topCategories = computed(() => categoryOptions.value.slice(0, 6));
+
+const selectCategory = (slug: string): void => {
+  filterForm.category = filterForm.category === slug ? '' : slug;
+  search();
+};
+
 const cityOptions = computed(() =>
   filterForm.state ? props.cities.filter((city) => city.state_code === filterForm.state) : [],
 );
@@ -53,12 +60,50 @@ watch(
 <template>
   <SeoHead :seo="seo" />
   <AppLayout>
+    <section
+      class="bg-brand-600 mb-6 rounded-xl px-6 py-8 sm:px-10"
+      aria-label="Busca rapida de anuncios"
+    >
+      <p class="text-brand-100 text-sm">{{ listings.total }} anuncios ativos</p>
+      <h1 class="mt-1 text-2xl font-semibold text-white sm:text-3xl">
+        Encontre o que voce procura perto de voce
+      </h1>
+      <form class="mt-5 flex max-w-xl gap-2 rounded-md bg-white p-1.5" @submit.prevent="search">
+        <input
+          v-model="filterForm.q"
+          class="flex-1 border-0 bg-transparent px-3 py-1.5 text-sm text-slate-900 focus:outline-none"
+          placeholder="Buscar por titulo, marca, categoria..."
+          type="search"
+        />
+        <button
+          class="bg-brand-600 hover:bg-brand-700 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white"
+        >
+          <Search class="h-4 w-4" />
+          Buscar
+        </button>
+      </form>
+      <div v-if="topCategories.length" class="mt-4 flex flex-wrap gap-2">
+        <button
+          v-for="category in topCategories"
+          :key="category.value"
+          type="button"
+          class="rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition-colors"
+          :class="
+            filterForm.category === category.value
+              ? 'text-brand-800 bg-white ring-white'
+              : 'bg-brand-500/40 hover:bg-brand-500/60 text-white ring-white/40'
+          "
+          @click="selectCategory(category.value)"
+        >
+          {{ category.label }}
+        </button>
+      </div>
+    </section>
+
     <section class="grid gap-8 lg:grid-cols-[320px_1fr]">
       <aside class="h-fit rounded-lg border bg-white p-5">
-        <h1 class="text-2xl font-bold">Classificados</h1>
-        <p class="mt-2 text-sm text-slate-600">
-          Busque anuncios por termo, categoria e localizacao.
-        </p>
+        <h2 class="text-lg font-bold">Filtrar anuncios</h2>
+        <p class="mt-2 text-sm text-slate-600">Refine por termo, categoria e localizacao.</p>
         <form class="mt-5 space-y-4" @submit.prevent="search">
           <div>
             <label class="mb-1 block text-sm font-medium" for="q">Busca</label>
@@ -106,7 +151,7 @@ watch(
             </div>
           </div>
           <button
-            class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-slate-900 px-4 py-2 font-medium text-white"
+            class="bg-brand-600 hover:bg-brand-700 inline-flex w-full items-center justify-center gap-2 rounded-md px-4 py-2 font-medium text-white"
           >
             <Search class="h-4 w-4" />
             Buscar
@@ -117,7 +162,9 @@ watch(
       <div class="space-y-5">
         <div class="flex items-center justify-between">
           <p class="text-sm text-slate-500">{{ listings.total }} anuncios encontrados</p>
-          <Link class="text-sm font-medium underline" href="/admin/anuncios/create"
+          <Link
+            class="text-brand-700 hover:text-brand-800 text-sm font-medium"
+            href="/admin/anuncios/create"
             >Publicar anuncio</Link
           >
         </div>

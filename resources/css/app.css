@@ -5,6 +5,17 @@
 
 @theme {
   --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-50: #e1f5ee;
+  --color-brand-100: #b8e8d7;
+  --color-brand-200: #9fe1cb;
+  --color-brand-300: #5dcaa5;
+  --color-brand-400: #35b78e;
+  --color-brand-500: #1d9e75;
+  --color-brand-600: #0f6e56;
+  --color-brand-700: #0c5b47;
+  --color-brand-800: #085041;
+  --color-brand-900: #04342c;
 }
 
 button,
